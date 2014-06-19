@@ -1,0 +1,5 @@
+name = App Link
+description = Link to a mobile apps via URI Scheme, falling back to an app store if needed.
+core = 7.x
+
+dependencies[] = ctools

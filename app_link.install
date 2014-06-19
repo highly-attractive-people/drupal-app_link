@@ -1,0 +1,68 @@
+<?php
+/**
+ * @file
+ * Install implementation file.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function app_link_schema() {
+  $schema['applink'] = array(
+    'description' => 'Table that holds information about links to Mobile Apps',
+    'export' => array(
+      'key' => 'path',
+      'key name' => 'Site path',
+      'primary key' => 'lid',
+      // Exports will be defined as $applink.
+      'identifier' => 'applink',
+      // Function hook name.
+      'default hook' => 'default_applink',
+      'api' => array(
+        'owner' => 'app_link',
+        // Base name for api include files.
+        'api' => 'default_applink',
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
+    ),
+    'fields' => array(
+      'lid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary ID field for the table. Not used for anything except internal lookups.',
+        // Do not export database-only keys.
+        'no export' => TRUE,
+      ),
+      'path' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Unique name to refer to App.',
+      ),
+      'web_url' => array(
+        'type' => 'varchar',
+        'length' => '2000',
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'URL a website of the app, Fallback if we can do nothing else.',
+      ),
+      'platform_data' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'description' => 'URLs and related metadata per platform.',
+      ),
+
+    ),
+    'primary key' => array('lid'),
+    'unique keys' => array(
+      'path' => array('path'),
+    ),
+  );
+
+  return $schema;
+}

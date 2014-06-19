@@ -1,0 +1,213 @@
+<?php
+/**
+ * @file
+ * Module that sets up redirection to mobile app.
+ *
+ * Contains: menu hook, custom page, admin forms, validation, boilerplate
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function app_link_menu() {
+  $items['app_link/%ctools_export_ui'] = array(
+    'title' => 'App Redirect',
+    'page callback' => 'app_link_bounce',
+    'page arguments' => array(1),
+    'load arguments' => array('applink_ctools_export_ui'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function app_link_theme($existing, $type, $theme, $path) {
+  return array(
+    'app_link' => array(
+      'variables' => array('platforms' => '', 'web_url' => ''),
+      'path' => $path . '/templates',
+      'template' => 'app-link',
+    ),
+  );
+}
+
+/**
+ * Prints html file by bypassing page.tpl.php.
+ */
+function app_link_bounce($applink) {
+  $platforms = array_merge_recursive(module_invoke_all('app_platform_info'), $applink->platform_data);
+  $platforms = drupal_json_encode($platforms);
+  $web_url = drupal_json_encode($applink->web_url);
+
+  drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
+  print theme('app_link', array('platforms' => $platforms, 'web_url' => $web_url));
+
+  // Do not just exit. Rather let Drupal run it's closure functions to
+  // complete the request. Some modules depend on this.
+  return NULL;
+}
+
+/**
+ * Settings form for show pattern creation/edition.
+ */
+function app_link_ctools_export_ui_form(&$form, &$form_state) {
+  $applink = $form_state['item'];
+  unset($form['info']);
+  $form['path'] = array(
+    '#default_value' => $applink->path,
+    '#title' => t('Path'),
+    '#description' => t('Path to redirect to a mobile app.'),
+    '#type' => 'textfield',
+    '#element_validate' => array('app_link_valid_id'),
+    '#maxlength' => 255,
+    '#required' => TRUE,
+  );
+  $form['web_url'] = array(
+    '#default_value' => $applink->web_url,
+    '#title' => t('Web Url'),
+    '#description' => t('Path to redirect to a mobile app.'),
+    '#type' => 'textfield',
+    '#element_validate' => array('app_link_valid_url'),
+    '#maxlength' => 2000,
+    '#required' => TRUE,
+  );
+  $platforms = module_invoke_all('app_platform_info');
+  $platform_data = $applink->platform_data;
+  $form['platform_data'] = array(
+    '#tree' => TRUE,
+  );
+  foreach ($platforms as $platform_id => $platform) {
+    $platform_data = isset($applink->platform_data[$platform_id]) ? $applink->platform_data[$platform_id] : NULL;
+    $form['platform_data'][$platform_id] = array(
+      '#type' => 'fieldset',
+      '#title' => check_plain($platform['name']),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#tree' => TRUE,
+    );
+    $form['platform_data'][$platform_id]['app_url'] = array(
+      '#default_value' => $platform_data ? $platform_data['app_url'] : '',
+      '#title' => t('App Url'),
+      '#description' => t("URL of the @app to redirect to", array('@app' => $platform['name'])),
+      '#attributes' => array('placeholder' => 'myapp://'),
+      '#type' => 'textfield',
+      '#element_validate' => array('app_link_valid_url_scheme'),
+      '#maxlength' => 2000,
+      '#required' => FALSE,
+    );
+    $form['platform_data'][$platform_id]['store_url'] = array(
+      '#default_value' => $platform_data ? $platform_data['store_url'] : '',
+      '#title' => t('Store Url'),
+      '#description' => t("URL to where the @app lives in the @app Store", array('@app' => $platform['name'])),
+      '#attributes' => array('placeholder' => 'https://itunes.apple.com/us/app/'),
+      '#type' => 'textfield',
+      '#element_validate' => array('app_link_valid_url'),
+      '#maxlength' => 2000,
+      '#required' => FALSE,
+    );
+    $form['platform_data'][$platform_id]['supports_qs'] = array(
+      '#default_value' => $platform_data ? $platform_data['supports_qs'] : FALSE,
+      '#title' => t('Supports Query Strings?'),
+      '#description' => t("If so, we'll pass the query-string, as in\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
+      '#type' => 'checkbox',
+    );
+    $form['platform_data'][$platform_id]['supports_path'] = array(
+      '#default_value' => $platform_data ? $platform_data['supports_path'] : FALSE,
+      '#title' => t('Supports Deep-Links?'),
+      '#description' => t("If so, we'll pass the 'path' query-string, as in\n/app_link/myapp?path=/settings\nmyapp://settings"),
+      '#type' => 'checkbox',
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Ensures that, if a value is entered, it is a valid URL.
+ */
+function app_link_valid_url($element, &$form_state) {
+  if (!empty($element['#value']) && filter_var($element['#value'], FILTER_VALIDATE_URL) === FALSE) {
+    form_error($element, t('The @platform @field is an invalid URL', array(
+      '@platform' => isset($element['#array_parents'][1]) ? $element['#array_parents'][1] : '',
+      '@field' => $element['#title'],
+    )));
+  }
+}
+
+
+/**
+ * Ensures that, if a value is entered, it is a valid URL Path.
+ */
+function app_link_valid_id($element, &$form_state) {
+  if (!empty($element['#value']) && preg_match('/[^a-z0-9\-\_]/', $element['#value'])) {
+    form_error($element, t('The @platform @field is an invalid Path Idenfier', array(
+      '@platform' => isset($element['#array_parents'][1]) ? $element['#array_parents'][1] : '',
+      '@field' => $element['#title'],
+    )));
+  }
+}
+/**
+ * Ensures that, if a value is entered, it is a valid URL Scheme Name.
+ * @link http://tools.ietf.org/html/rfc3986#section-3.1 RFC3986 Scheme Name
+ */
+function app_link_valid_url_scheme($element, &$form_state) {
+  if (!empty($element['#value']) && !preg_match('#^[a-z][a-z0-9\+\.\-]+://#', $element['#value'])) {
+    form_error($element, t('The @platform @field is an invalid URL Scheme', array(
+      '@platform' => isset($element['#array_parents'][1]) ? $element['#array_parents'][1] : '',
+      '@field' => $element['#title'],
+    )));
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function app_link_permission() {
+  return array(
+    'administer app link' => array(
+      'title' => t('Administer App Link entries'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function app_link_ctools_plugin_api($owner, $api) {
+  if ($owner == 'app_link' && $api == 'default_applink') {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function app_link_ctools_plugin_directory($module, $type) {
+  // Load the export_ui plugin.
+  return 'plugins/' . $type;
+}
+
+/**
+ * Implements app_platform_info().
+ */
+function app_link_app_platform_info() {
+  return array(
+    'ios' => array(
+      'name' => t('iOS App'),
+      'match' => 'iOS|iPhone|iPad|iPod',
+    ),
+    'android' => array(
+      'name' => t('Android App'),
+      'match' => 'android',
+      'not_match' => 'kindle',
+    ),
+    'windowsphone' => array(
+      'name' => t('Windows Phone App'),
+      'match' => 'Windows Phone',
+    ),
+  );
+}
