@@ -55,7 +55,7 @@ function getPlatform (platforms) {
     if (platform.not_match && ua.match(new RegExp(platform.not_match))) {
       continue;
     }
-    if (!!platform.app_url) {
+    if (!platform.app_url) {
       continue;
     }
     return platform;
