@@ -151,10 +151,9 @@ function app_link_valid_id($element, &$form_state) {
 }
 
 /**
- * Ensures that, if a value is entered, it is a valid URL Scheme Name.
+ * Ensures that, if a value is entered, it is a valid RFC3986 URL Scheme Name.
  */
 function app_link_valid_url_scheme($element, &$form_state) {
-  // http://tools.ietf.org/html/rfc3986#section-3.1 RFC3986 Scheme Name
   if (!empty($element['#value']) && !preg_match('#^[a-z][a-z0-9\+\.\-]+://#', $element['#value'])) {
     form_error($element, t('The @platform @field is an invalid URL Scheme', array(
       '@platform' => isset($element['#array_parents'][1]) ? $element['#array_parents'][1] : '',
