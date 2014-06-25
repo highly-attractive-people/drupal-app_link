@@ -1,18 +1,16 @@
-App Link
-===================
-
-Drupal module to redirect user's to a native app.
-
-Use this module when you want to link native apps on end-user user platforms,
-such as mobile devices.  Further, the module falls back to an app store link,
-when the suer does not have the app installed.
+INTRODUCTION
+-----------------------------
+The App Link module to redirect user's to a native app. Use this module
+to link native apps on end-user user platforms, such as mobile devices.
+Further, the module falls back to an app store link, when the user does
+not have the app installed.
 
 This module provides:
   * A user interface to manage and export your app links.
   * A CTools export plugin for configuration deployment.
 
 TO CREATE AN APP LINK
-------------
+-----------------------------
 1. In the Drupal Admin, head to Configuration \ Search and Metadata \ App Link
  - /admin/config/search/applink/add
 
