@@ -138,7 +138,6 @@ function app_link_valid_url($element, &$form_state) {
   }
 }
 
-
 /**
  * Ensures that, if a value is entered, it is a valid URL Path.
  */
@@ -150,6 +149,7 @@ function app_link_valid_id($element, &$form_state) {
     )));
   }
 }
+
 /**
  * Ensures that, if a value is entered, it is a valid URL Scheme Name.
  * @link http://tools.ietf.org/html/rfc3986#section-3.1 RFC3986 Scheme Name

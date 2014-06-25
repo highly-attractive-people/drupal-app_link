@@ -22,16 +22,23 @@
 </head>
 <body>
 <script>
+(function () {
+
 // Insert data from server-side
 var PLATFORMS = <?php print $platforms; ?>;
 var web_url = <?php print $web_url; ?>;
 
-var platform = getPlatform(PLATFORMS);
-if (platform) {
-  gotoApp(platform);
-}
-else {
-  location.href = web_url;
+/**
+ *
+ */
+function gotoAppLink (platforms, web_url) {
+  var platform = getPlatform(platforms);
+  if (platform) {
+    gotoApp(platform);
+  }
+  else {
+    location.href = web_url;
+  }
 }
 
 /**
