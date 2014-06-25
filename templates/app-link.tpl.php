@@ -22,21 +22,15 @@
 </head>
 <body>
 <script>
-(function () {
-
-// Insert data from server-side
-var PLATFORMS = <?php print $platforms; ?>;
-var web_url = <?php print $web_url; ?>;
-
-gotoAppLink(<?php print $platforms; ?>)
-
 /**
- *
+ * Direct user to an App Link
  */
-function gotoAppLink (platforms, web_url) {
-  var platform = getPlatform(platforms);
+function app_link_goto_app_link () {
+  var platforms = <?php print $platforms; ?>;
+  var web_url = <?php print $web_url; ?>;
+  var platform = app_link_get_platform(platforms);
   if (platform) {
-    gotoApp(platform);
+    app_link_goto_app(platform);
   }
   else {
     location.href = web_url;
@@ -51,7 +45,7 @@ function gotoAppLink (platforms, web_url) {
  *   A platform's conditions, urls, and options
  *   Or, null if no matching platform was found
  */
-function getPlatform (platforms) {
+function app_link_get_platform (platforms) {
   var ua = navigator.userAgent;
   var id, platform;
   for (id in platforms) {
@@ -87,13 +81,13 @@ function getPlatform (platforms) {
  *   {boolean} platform.supports_qs
  *     True if the App URL supports appending a query-string
  */
-function gotoApp (platform) {
+function app_link_goto_app (platform) {
   var app_url = platform.app_url;
   var store_url = platform.store_url;
   var supports_path = platform.supports_path;
   var supports_qs = platform.supports_qs;
-  var _GET = getQuery();
-  app_url += (supports_path && _GET.path) || '';
+  var query_params = app_link_get_query_params();
+  app_url += (supports_path && query_params.path) || '';
   app_url += (supports_qs && location.search) || '';
 
   // Attempt to send to app
@@ -124,7 +118,7 @@ function gotoApp (platform) {
  * @return {object<key:value>}
  *   Returns a map of key values from the query string
  */
-function getQuery () {
+function app_link_get_query_params () {
   var query = {};
   (location.search || '')
     // Remove the '?'
@@ -138,7 +132,10 @@ function getQuery () {
     });
   return query;
 }
-}());
+
+// Start Script
+app_link_goto_app_link();
+
 </script>
 </body>
 </html>
