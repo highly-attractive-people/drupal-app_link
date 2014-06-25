@@ -28,6 +28,8 @@
 var PLATFORMS = <?php print $platforms; ?>;
 var web_url = <?php print $web_url; ?>;
 
+gotoAppLink(<?php print $platforms; ?>)
+
 /**
  *
  */
@@ -136,7 +138,7 @@ function getQuery () {
     });
   return query;
 }
-
+}());
 </script>
 </body>
 </html>
