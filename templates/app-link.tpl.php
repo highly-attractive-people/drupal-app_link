@@ -48,11 +48,11 @@ function getPlatform (platforms) {
   for (id in platforms) {
     platform = platforms[id];
     // If a platform matches the "match" expression, or there is no "match" expression
-    if (platform.match && !ua.match(new RegExp(platform.match))) {
+    if (platform.match && !ua.match(new RegExp(platform.match, 'i'))) {
       continue;
     }
     // If a platform does not match the "not_match" expression, or there is no "not_match" expression
-    if (platform.not_match && ua.match(new RegExp(platform.not_match))) {
+    if (platform.not_match && ua.match(new RegExp(platform.not_match, 'i'))) {
       continue;
     }
     if (!platform.app_url) {
