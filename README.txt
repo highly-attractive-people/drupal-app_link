@@ -1,9 +1,13 @@
+APP LINK - https://www.drupal.org/sandbox/robcolburn/2289011
+======================================================
+
 CONTENTS OF THIS FILE
 ---------------------
  * Introduction
  * Requirements
  * Installation
  * Configuration
+ * Troubleshooting
 
 INTRODUCTION
 -----------------------------
@@ -67,3 +71,7 @@ CONFIGURATION
    3. Hit save, and you'll see your app link listed.
    4. Try it out.
      - If you choose "my-cool-app", try going to `SITE/app_link/my-cool-app`
+
+TROUBLESHOOTING
+ * Please report any issues to the Project's Issue Queue
+   https://www.drupal.org/project/issues/2289011
