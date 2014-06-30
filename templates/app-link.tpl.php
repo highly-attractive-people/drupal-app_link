@@ -4,17 +4,18 @@
  * Display minimal html page to hand off to javascript.
  *
  * Variables:
- * - $web_url: (string) URL to fallback if we are unable to link to a platform
- * - $platform_info: (array) An associative array containing the key-values for
- *   -  name: Proper name of an app on platform
- *   -  match: RegExp that user-agent must match
- *   -  not_match: RegExp that user-agent must not match
+ * - $scripts: (array) Raw javascript strings from platform plugins.
  *
- * - $platform_data: (array) An associative array containing the key-values, example:
- *   -  app_url: URL to the App
- *   -  store_url: URL to the App Store
- *   -  supports_path: Does App URL Support paths?
- *   -  supports_qs: Does App URL Support query strings?
+ * - $platform_info: (string) JSON-encoded object, containing data by platform:
+ *   -  name: Proper name of an app on platform.
+ *   -  match: RegExp that user-agent must match.
+ *   -  not_match: RegExp that user-agent must not match.
+ *   -  js_callback: Name of javascript function to call if matched.
+ *
+ * - $platform_data: (string) JSON-encoded object, containing data by platform:
+ *    See plugin javascript for more information.
+ *
+ * - $web_url: (string) URL to fallback if we are unable to link to a platform.
  */
 ?><!DOCTYPE html>
 <html>

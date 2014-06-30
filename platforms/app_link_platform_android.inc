@@ -15,10 +15,10 @@ $plugin = array(
 /**
  * Helper function to construct a Drupal form for Android platform parameters.
  *
- * @param $conf
+ * @param array $conf
  *   An array of existing configurations.
  *
- * @return
+ * @return array
  *   A Drupal form structure.
  */
 function app_link_platform_android_form($conf = array()) {
