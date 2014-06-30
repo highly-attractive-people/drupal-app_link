@@ -66,5 +66,4 @@ function app_link_platform_ios(platform, web_url) {
       });
     return query;
   }
-
 }
