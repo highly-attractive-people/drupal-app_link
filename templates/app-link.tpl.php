@@ -5,10 +5,12 @@
  *
  * Variables:
  * - $web_url: (string) URL to fallback if we are unable to link to a platform
- * - $platforms: (array) An associative array containing the key-values for
+ * - $platform_info: (array) An associative array containing the key-values for
  *   -  name: Proper name of an app on platform
  *   -  match: RegExp that user-agent must match
  *   -  not_match: RegExp that user-agent must not match
+ *
+ * - $platform_data: (array) An associative array containing the key-values, example:
  *   -  app_url: URL to the App
  *   -  store_url: URL to the App Store
  *   -  supports_path: Does App URL Support paths?
@@ -21,120 +23,42 @@
 <title><?php print t('Mobile App'); ?></title>
 </head>
 <body>
+
+<?php foreach ($scripts as $script) : ?>
+  <script>
+    <?php print $script ?>
+  </script>
+<?php endforeach; ?>
+
 <script>
-/**
- * Direct user to an App Link
- */
-function app_link_goto_app_link () {
-  var platforms = <?php print $platforms; ?>;
-  var web_url = <?php print $web_url; ?>;
-  var platform = app_link_get_platform(platforms);
-  if (platform) {
-    app_link_goto_app(platform);
-  }
-  else {
-    location.href = web_url;
-  }
-}
+var PLATFORM_INFO = <?php print $platform_info; ?>;
+var PLATFORM_DATA = <?php print $platform_data; ?>;
+var WEB_URL = <?php print $web_url; ?>;
 
 /**
- * Determine if the user agent matches any of the known platform apps
- * @param {object<id:object>} platforms
- *   A key-value map of platform: conditions, urls, and options
- * @return {object|null}
- *   A platform's conditions, urls, and options
- *   Or, null if no matching platform was found
+ * Determine platform based on userAgent, and call it's hook.
+ * If we don't have a hook, bail to redirect.
  */
-function app_link_get_platform (platforms) {
-  var ua = navigator.userAgent;
-  var id, platform;
-  for (id in platforms) {
-    platform = platforms[id];
+function app_link_route () {
+  var UA = navigator.userAgent;
+  var platform;
+  for (var id in PLATFORM_INFO) {
+    platform = PLATFORM_INFO[id];
     // If a platform matches the "match" expression, or there is no "match" expression
-    if (platform.match && !ua.match(new RegExp(platform.match, 'i'))) {
+    if (platform.match && !UA.match(new RegExp(platform.match, 'i'))) {
       continue;
     }
     // If a platform does not match the "not_match" expression, or there is no "not_match" expression
-    if (platform.not_match && ua.match(new RegExp(platform.not_match, 'i'))) {
+    if (platform.not_match && UA.match(new RegExp(platform.not_match, 'i'))) {
       continue;
     }
-    if (!platform.app_url) {
-      continue;
-    }
-    return platform;
+    window[platform.js_callback](PLATFORM_DATA[id], WEB_URL);
+    return true;
   }
-  return null;
+  window.location = WEB_URL;
 }
 
-/**
- * Directs a user to the Mobile App on their platform
- * Alternatively, the app store if they don't have the App.
- *
- * @param {object} platform
- *   Device platform to direct the user to, contains:
- *   {string} platform.app_url
- *      URL Scheme to the app 
- *   {string} platform.store_url
- *      URL of the store page to go to, if app is not installed
- *   {boolean} platform.supports_path
- *     True if the App URL supports appending a path
- *   {boolean} platform.supports_qs
- *     True if the App URL supports appending a query-string
- */
-function app_link_goto_app (platform) {
-  var app_url = platform.app_url;
-  var store_url = platform.store_url;
-  var supports_path = platform.supports_path;
-  var supports_qs = platform.supports_qs;
-  var query_params = app_link_get_query_params();
-  app_url += (supports_path && query_params.path) || '';
-  app_url += (supports_qs && location.search) || '';
-
-  // Attempt to send to app
-  try {
-    location.href = app_url;
-  }
-  // Fallback: Can't get to app, go to store
-  catch (e) {
-    location.href = store_url;
-  }
-  // Backup fallback - sometimes the catch doesn't work… Apple. Wait, and try again.
-  var now = Date.now || function () { return (new Date()).getTime(); };
-  var start = now();
-  setTimeout(function () {
-    if (now() - start < 3000) {
-      try {
-        location.href = store_url;
-      }
-      catch (e) {
-        // c'est la vie
-      }
-    }
-  }, 25);
-}
-
-/**
- * Parse Query String parameters
- * @return {object<key:value>}
- *   Returns a map of key values from the query string
- */
-function app_link_get_query_params () {
-  var query = {};
-  (location.search || '')
-    // Remove the '?'
-    .substr(1)
-    // Replace space characters
-    .replace(/\+/g, ' ')
-    // Grab key-value pairs
-    .replace(/([^&;=]+)=?([^&;]*)/g, function (m, k, v) {
-      // Decode keys and values separately
-      query[decodeURIComponent(k)] = decodeURIComponent(v);
-    });
-  return query;
-}
-
-// Start Script
-app_link_goto_app_link();
+app_link_route();
 
 </script>
 </body>
