@@ -32,7 +32,7 @@ function app_link_theme($existing, $type, $theme, $path) {
         'platform_info' => '',
         'platform_data' => '',
         'web_url' => '',
-        'scripts' => array()
+        'scripts' => array(),
       ),
       'path' => $path . '/templates',
       'template' => 'app-link',
@@ -49,11 +49,11 @@ function app_link_bounce($applink) {
 
   ctools_include('plugins');
   $platform_info = ctools_get_plugins('app_link', 'platform');
-  // Inline JavaScript for performance, we want 0 external requests
+  // Inline JavaScript for performance, we want 0 external requests.
   $scripts = array();
-  foreach ($platform_info as $id => $platform) {
+  foreach ($platform_info as $platform) {
     if ($platform['js_src']) {
-      $scripts []= file_get_contents($platform['js_src']);;
+      $scripts[] = file_get_contents($platform['js_src']);;
     }
   }
 

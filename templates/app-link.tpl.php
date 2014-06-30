@@ -44,11 +44,11 @@ function app_link_route () {
   var platform;
   for (var id in PLATFORM_INFO) {
     platform = PLATFORM_INFO[id];
-    // If a platform matches the "match" expression, or there is no "match" expression
+    // Validate if UA matches the platform's "match" expression.
     if (platform.match && !UA.match(new RegExp(platform.match, 'i'))) {
       continue;
     }
-    // If a platform does not match the "not_match" expression, or there is no "not_match" expression
+    // Validate if UA does not matche the platform's "match" expression.
     if (platform.not_match && UA.match(new RegExp(platform.not_match, 'i'))) {
       continue;
     }

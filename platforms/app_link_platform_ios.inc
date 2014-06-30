@@ -13,7 +13,16 @@ $plugin = array(
   'form' => 'app_link_platform_ios_form',
 );
 
-function app_link_platform_ios_form ($conf = array()) {
+/**
+ * Helper function to construct a Drupal form for iOS platform parameters.
+ *
+ * @param $conf
+ *   An array of existing configurations.
+ *
+ * @return
+ *   A Drupal form structure.
+ */
+function app_link_platform_ios_form($conf = array()) {
   $form = array(
     '#type' => 'fieldset',
     '#title' => t('iOS App'),
