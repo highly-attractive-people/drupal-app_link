@@ -22,7 +22,7 @@ $plugin = array(
  * @return array
  *   A Drupal form structure.
  */
-function app_link_platform_ios_form($conf = array()) {
+function app_link_platform_ios_form(array $conf = array()) {
   $form = array(
     '#type' => 'fieldset',
     '#title' => t('iOS App'),
