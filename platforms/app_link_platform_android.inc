@@ -60,13 +60,13 @@ function app_link_platform_android_form(array $conf = array()) {
     '#default_value' => isset($conf['store_url']) ? $conf['store_url'] : '',
   );
   $form['supports_qs'] = array(
-    '#title' => t('Android App supports Query String?'),
+    '#title' => t('Android App supports Query Strings?'),
     '#description' => t("If so, we'll pass the query-string, as in\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
     '#type' => 'checkbox',
     '#default_value' => isset($conf['supports_qs']) ? $conf['supports_qs'] : FALSE,
   );
   $form['supports_path'] = array(
-    '#title' => t('Android App supports Deep Link?'),
+    '#title' => t('Android App supports Deep Links?'),
     '#description' => t("If so, we'll pass the 'path' query-string, as in\n/app_link/myapp?path=/settings\nmyapp://settings"),
     '#type' => 'checkbox',
     '#default_value' => isset($conf['supports_path']) ? $conf['supports_path'] : FALSE,
