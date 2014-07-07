@@ -66,3 +66,29 @@ function app_link_schema() {
 
   return $schema;
 }
+
+/**
+ * Update platform signatures.
+ */
+function app_link_update_7101() {
+  $links = db_query("SELECT * FROM {applink}");
+  foreach ($links as $link) {
+    $changed = FALSE;
+    $platform_data = unserialize($link->platform_data);
+    foreach ($platform_data as $key => $data) {
+      if (strpos($key, 'app_link_platform_') !== 0) {
+        $platform_data['app_link_platform_' . $key] = $data;
+        unset($platform_data[$key]);
+        $changed = TRUE;
+      }
+    }
+
+    if ($changed) {
+      db_update('applink')
+        ->fields(array('platform_data' => serialize($platform_data)))
+        ->condition('lid', $link->lid)
+        ->execute();
+    }
+  }
+}
+
