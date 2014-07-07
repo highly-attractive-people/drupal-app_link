@@ -31,7 +31,7 @@ function app_link_platform_ios_form(array $conf = array()) {
     '#tree' => TRUE,
   );
   $form['app_url'] = array(
-    '#title' => t('iOS App URL Scheme'),
+    '#title' => t('App URL Scheme'),
     '#description' => t('URL Scheme of the iOS App to redirect to'),
     '#attributes' => array('placeholder' => 'myapp://'),
     '#type' => 'textfield',
@@ -41,8 +41,8 @@ function app_link_platform_ios_form(array $conf = array()) {
     '#default_value' => isset($conf['app_url']) ? $conf['app_url'] : '',
   );
   $form['store_url'] = array(
-    '#title' => t('App Store Url'),
-    '#description' => t('URL to where the iOS App lives in the App Store'),
+    '#title' => t('App Page on the App Store'),
+    '#description' => t('The URL where you can download App lives in the App Store.'),
     '#attributes' => array('placeholder' => 'https://itunes.apple.com/us/app/'),
     '#type' => 'textfield',
     '#element_validate' => array('app_link_valid_url'),
@@ -51,14 +51,14 @@ function app_link_platform_ios_form(array $conf = array()) {
     '#default_value' => isset($conf['store_url']) ? $conf['store_url'] : '',
   );
   $form['supports_qs'] = array(
-    '#title' => t('iOS App supports Query Strings?'),
-    '#description' => t("If so, we'll pass the query-string, as in\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
+    '#title' => t('Append the query string to the App\'s URL Scheme'),
+    '#description' => t("If checked, the query string will be appended the App's URL Scheme, example:\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
     '#type' => 'checkbox',
     '#default_value' => isset($conf['supports_qs']) ? $conf['supports_qs'] : FALSE,
   );
   $form['supports_path'] = array(
-    '#title' => t('iOS App supports Deep Links?'),
-    '#description' => t("If so, we'll pass the 'path' query-string, as in\n/app_link/myapp?path=/settings\nmyapp://settings"),
+    '#title' => t('Append the "path" param to the App\'s URL Scheme'),
+    '#description' => t("If checked, we'll pass the 'path' query-string parameter will be appended to the App's URL Scheme, example:\n/app_link/myapp?path=/settings\nmyapp://settings"),
     '#type' => 'checkbox',
     '#default_value' => isset($conf['supports_path']) ? $conf['supports_path'] : FALSE,
   );

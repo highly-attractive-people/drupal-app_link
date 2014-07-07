@@ -40,37 +40,35 @@ CONFIGURATION
      (by default, everyone has this permission)
    - The "Administer App Link entries" is required to add/edit App Links
      (by default, administrators have this permission)
- * Create an App Link in Configuration » Search and Metadata » App Link:
-   1. Click the Add button at the top of the page.
-   2. Fill out the Add App Link Form to create a new App Link.
+ * Create an App Link:
+   For brevity, we'll assume you only have an iOS App… about cats.
+   1. Navigate to Configuration » Search and Metadata » App Link
+   2. Click the Add button near the top of the page (by page title).
+   3. Fill out the Add App Link Form.
      - Path
-       The path will become the link name, for example "my-cool-app",
-       will become SITE/app_link/my-cool-app
-     - Web URL
+       The path that will link to the app, example:
+       mycatapp
+       http://mysite.com/app_link/mycatapp
+     - Fallback Web URL
        Where users will go on unsupported platforms (like desktop),
        since we can't direct them to an app.
      - iOS App URL
        The URL Scheme to direct the user to the App, example:
-       myapp://
-     - iOS Store URL
-       The URL to the App Store where the user to download the App,
-       if they don't have it installed.
-       http://itunes.apple.com/us/app/APP
-     - iOS Supports Query Strings
-       Some apps support passing a query-string information.
-       If this is checked, we'll pass query-strings to the app:
-         SITE/app_link/my-cool-app?test=2&key=value
-       Would direct to
-         myapp://live?test=2&key=value
-     - iOS Supports Deep Links?
-       Some apps support deep links to access specific pieces of content.
-       If this is checked, we'll pass deep-links to the app:
-         SITE/app_link/my-cool-app?path=/deep/link
-       Would direct to
-         myapp://deep/link
-   3. Hit save, and you'll see your app link listed.
-   4. Try it out.
-     - If you choose "my-cool-app", try going to `SITE/app_link/my-cool-app`
+       mycatapp://
+     - App Page on the App Store
+       The URL to the App Store where the user can download the App.
+       https://itunes.apple.com/us/app/game-for-cats/id406740405?mt=8
+     - Append the query string to the App's URL Scheme
+       If checked, the query string will be appended the App's URL Scheme, example:
+       http://mysite.com/app_link/mycatapp?a=b&c=d
+       mycatapp://?a=b&c=d
+     - Append the "path" param to the App\'s URL Scheme
+       If checked, the query string will be appended the App's URL Scheme, example:
+       http://mysite.com/app_link/mycatapp?path=cat/video
+       mycatapp://cat/video
+   4. Hit save, and you'll see your link listed.
+   5. Try it out.  Navigate to the desired path:
+     http://mysite.com/app_link/mycatapp
 
 TROUBLESHOOTING
  * Please report any issues to the Project's Issue Queue

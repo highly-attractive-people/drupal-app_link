@@ -79,7 +79,8 @@ function app_link_ctools_export_ui_form(&$form, &$form_state) {
   $form['path'] = array(
     '#default_value' => $applink->path,
     '#title' => t('Path'),
-    '#description' => t('Path to redirect to a mobile app.'),
+    '#description' => t('Site path to redirect to the mobile app.'),
+    '#field_prefix' => url('app_link/', array('absolute' => TRUE)),
     '#type' => 'textfield',
     '#element_validate' => array('app_link_valid_id'),
     '#maxlength' => 255,
@@ -87,8 +88,8 @@ function app_link_ctools_export_ui_form(&$form, &$form_state) {
   );
   $form['web_url'] = array(
     '#default_value' => $applink->web_url,
-    '#title' => t('Web Url'),
-    '#description' => t('Path to redirect to a mobile app.'),
+    '#title' => t('Fallback Web URL'),
+    '#description' => t('If we are unable to direct the user to an app or store, where shall we redirect them to?'),
     '#type' => 'textfield',
     '#element_validate' => array('app_link_valid_url'),
     '#maxlength' => 2000,
