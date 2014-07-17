@@ -50,8 +50,8 @@ function app_link_platform_iphone_form(array $conf = array()) {
     '#default_value' => isset($conf['store_url']) ? $conf['store_url'] : '',
   );
   $form['supports_qs'] = array(
-     '#title' => t('Append the query string to the App\'s URL Scheme'),
-     '#description' => t("If checked, the query string will be appended the App's URL Scheme, example:\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
+    '#title' => t('Append the query string to the App\'s URL Scheme'),
+    '#description' => t("If checked, the query string will be appended the App's URL Scheme, example:\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
     '#type' => 'checkbox',
     '#default_value' => isset($conf['supports_qs']) ? $conf['supports_qs'] : FALSE,
   );

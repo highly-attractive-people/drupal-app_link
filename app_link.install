@@ -105,7 +105,7 @@ function app_link_update_7102() {
         $platform_data['app_link_platform_iphone'] = $data;
         $platform_data['app_link_platform_ipad'] = $data;
         unset($platform_data[$key]);
-        $add = TRUE;
+        $changed = TRUE;
       }
     }
 
