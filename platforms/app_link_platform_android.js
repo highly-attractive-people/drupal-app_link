@@ -1,12 +1,12 @@
 /**
  * @file
- * Directs an iOS user to the Mobile App
- * Alternatively, the Marketplace if they don't have the App.
+ * Directs an Android user to the Mobile App
+ * Alternatively, the Google Play Store if they don't have the App.
  *
  * @param {object} platform
  *   Device platform to direct the user to, contains:
  *   {string} platform.app_url
- *      URL Scheme to the app 
+ *      URL Scheme to the app
  *   {string} platform.store_url
  *      URL of the store page to go to, if app is not installed
  *   {boolean} platform.supports_path

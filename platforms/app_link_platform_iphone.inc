@@ -1,20 +1,19 @@
 <?php
 /**
  * @file
- * App Link plugin to define iOS App.
+ * App Link plugin to define iPhone App.
  */
 
 $plugin = array(
-  'name' => t('iOS App'),
-  'match' => 'iOS|iPhone|iPad|iPod',
-  'not_match' => 'kindle',
-  'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_ios.js',
-  'js_callback' => 'app_link_platform_ios',
-  'form' => 'app_link_platform_ios_form',
+  'name' => t('iPhone App'),
+  'match' => 'iPhone|iPod',
+  'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_iphone.js',
+  'js_callback' => 'app_link_platform_iphone',
+  'form' => 'app_link_platform_iphone_form',
 );
 
 /**
- * Helper function to construct a Drupal form for iOS platform parameters.
+ * Helper function to construct a Drupal form for iPhone platform parameters.
  *
  * @param array $conf
  *   An array of existing configurations.
@@ -22,17 +21,17 @@ $plugin = array(
  * @return array
  *   A Drupal form structure.
  */
-function app_link_platform_ios_form(array $conf = array()) {
+function app_link_platform_iphone_form(array $conf = array()) {
   $form = array(
     '#type' => 'fieldset',
-    '#title' => t('iOS App'),
+    '#title' => t('iPhone App'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
   $form['app_url'] = array(
     '#title' => t('App URL Scheme'),
-    '#description' => t('URL Scheme of the iOS App to redirect to'),
+    '#description' => t('URL Scheme of the iPhone App to redirect to'),
     '#attributes' => array('placeholder' => 'myapp://'),
     '#type' => 'textfield',
     '#element_validate' => array('app_link_valid_url_scheme'),
@@ -41,8 +40,8 @@ function app_link_platform_ios_form(array $conf = array()) {
     '#default_value' => isset($conf['app_url']) ? $conf['app_url'] : '',
   );
   $form['store_url'] = array(
-    '#title' => t('App Page on the App Store'),
-    '#description' => t('The URL where you can download App lives in the App Store.'),
+    '#title' => t('App Store Url'),
+    '#description' => t('URL to where the iPhone App lives in the App Store'),
     '#attributes' => array('placeholder' => 'https://itunes.apple.com/us/app/'),
     '#type' => 'textfield',
     '#element_validate' => array('app_link_valid_url'),
@@ -51,8 +50,8 @@ function app_link_platform_ios_form(array $conf = array()) {
     '#default_value' => isset($conf['store_url']) ? $conf['store_url'] : '',
   );
   $form['supports_qs'] = array(
-    '#title' => t('Append the query string to the App\'s URL Scheme'),
-    '#description' => t("If checked, the query string will be appended the App's URL Scheme, example:\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
+     '#title' => t('Append the query string to the App\'s URL Scheme'),
+     '#description' => t("If checked, the query string will be appended the App's URL Scheme, example:\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
     '#type' => 'checkbox',
     '#default_value' => isset($conf['supports_qs']) ? $conf['supports_qs'] : FALSE,
   );

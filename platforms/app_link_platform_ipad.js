@@ -1,11 +1,11 @@
 /**
- * Directs an iOS user to the Mobile App
+ * Directs an iPad user to the Mobile App
  * Alternatively, the app store if they don't have the App.
  *
  * @param {object} platform
  *   Device platform to direct the user to, contains:
  *   {string} platform.app_url
- *      URL Scheme to the app 
+ *      URL Scheme to the app
  *   {string} platform.store_url
  *      URL of the store page to go to, if app is not installed
  *   {boolean} platform.supports_path
@@ -15,7 +15,7 @@
  * @param {string} web_url
  *    A fallback URL, if we can't direct the user somewhere better.
  */
-function app_link_platform_ios(platform, web_url) {
+function app_link_platform_ipad(platform, web_url) {
   var fallback_url = platform.store_url || web_url;
   var app_url = getAppUrl();
   var supports_path = platform.supports_path;
