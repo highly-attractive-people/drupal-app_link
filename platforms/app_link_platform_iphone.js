@@ -1,5 +1,5 @@
 /**
- * Directs an iOS user to the Mobile App
+ * Directs an iphone user to the Mobile App
  * Alternatively, the app store if they don't have the App.
  *
  * @param {object} platform
@@ -15,7 +15,7 @@
  * @param {string} web_url
  *    A fallback URL, if we can't direct the user somewhere better.
  */
-function app_link_platform_ios(platform, web_url) {
+function app_link_platform_iphone(platform, web_url) {
   var fallback_url = platform.store_url || web_url;
   var app_url = getAppUrl();
   var supports_path = platform.supports_path;
