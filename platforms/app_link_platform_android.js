@@ -1,7 +1,7 @@
 /**
  * @file
- * Directs an iOS user to the Mobile App
- * Alternatively, the Marketplace if they don't have the App.
+ * Directs an Android user to the Mobile App
+ * Alternatively, the Google Play Store if they don't have the App.
  *
  * @param {object} platform
  *   Device platform to direct the user to, contains:

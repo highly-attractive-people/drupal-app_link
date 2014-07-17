@@ -30,7 +30,7 @@ function app_link_platform_kindle_fire_form(array $conf = array()) {
     '#tree' => TRUE,
   );
   $form['app_url'] = array(
-    '#title' => t('App URL Scheme'),
+    '#title' => t('Kindle Fire App URL Scheme'),
     '#description' => t('URL Scheme of the Kindle Fire App to redirect to'),
     '#attributes' => array('placeholder' => 'myapp://'),
     '#type' => 'textfield',
@@ -40,8 +40,8 @@ function app_link_platform_kindle_fire_form(array $conf = array()) {
     '#default_value' => isset($conf['app_url']) ? $conf['app_url'] : '',
   );
   $form['store_url'] = array(
-    '#title' => t('App Page on Amazon'),
-    '#description' => t('The URL where you can download App lives in Amazon\'s Fire Store.'),
+    '#title' => t('Amazon Url'),
+    '#description' => t('URL to where the Kindle Fire App lives in Amazon Fire Store'),
     '#attributes' => array('placeholder' => 'http://www.amazon.com/gp/product/<product_id>'),
     '#type' => 'textfield',
     '#element_validate' => array('app_link_valid_url'),
@@ -50,14 +50,14 @@ function app_link_platform_kindle_fire_form(array $conf = array()) {
     '#default_value' => isset($conf['store_url']) ? $conf['store_url'] : '',
   );
   $form['supports_qs'] = array(
-    '#title' => t('Append the query string to the App\'s URL Scheme'),
-    '#description' => t("If checked, the query string will be appended the App's URL Scheme, example:\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
+    '#title' => t('Kindle Fire App supports Query Strings?'),
+    '#description' => t("If so, we'll pass the query-string, as in\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
     '#type' => 'checkbox',
     '#default_value' => isset($conf['supports_qs']) ? $conf['supports_qs'] : FALSE,
   );
   $form['supports_path'] = array(
-    '#title' => t('Append the "path" param to the App\'s URL Scheme'),
-    '#description' => t("If checked, we'll pass the 'path' query-string parameter will be appended to the App's URL Scheme, example:\n/app_link/myapp?path=/settings\nmyapp://settings"),
+    '#title' => t('Kindle Fire App supports Deep Links?'),
+    '#description' => t("If so, we'll pass the 'path' query-string, as in\n/app_link/myapp?path=/settings\nmyapp://settings"),
     '#type' => 'checkbox',
     '#default_value' => isset($conf['supports_path']) ? $conf['supports_path'] : FALSE,
   );
