@@ -92,3 +92,28 @@ function app_link_update_7101() {
   }
 }
 
+/**
+ * Update platform signatures.
+ */
+function app_link_update_7102() {
+  $links = db_query("SELECT * FROM {applink}");
+  foreach ($links as $link) {
+    $changed = FALSE;
+    $platform_data = unserialize($link->platform_data);
+    foreach ($platform_data as $key => $data) {
+      if (strpos($key, 'app_link_platform_ios') !== 0) {
+        $platform_data['app_link_platform_iphone'] = $data;
+        $platform_data['app_link_platform_ipad'] = $data;
+        unset($platform_data[$key]);
+        $changed = TRUE;
+      }
+    }
+
+    if ($changed) {
+      db_update('applink')
+        ->fields(array('platform_data' => serialize($platform_data)))
+        ->condition('lid', $link->lid)
+        ->execute();
+      }
+  }
+}
