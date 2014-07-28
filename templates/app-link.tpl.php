@@ -26,9 +26,7 @@
 <body>
 
 <?php foreach ($scripts as $script) : ?>
-  <script>
-    <?php print $script ?>
-  </script>
+  <?php print $script ?>
 <?php endforeach; ?>
 
 <script>

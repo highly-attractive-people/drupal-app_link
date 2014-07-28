@@ -52,8 +52,8 @@ function app_link_bounce($applink) {
   // Inline JavaScript for performance, we want 0 external requests.
   $scripts = array();
   foreach ($platform_info as $platform) {
-    if ($platform['js_src']) {
-      $scripts[] = file_get_contents($platform['js_src']);;
+    if ($platform['js_src'] && empty($scripts[$platform['js_src']])) {
+      $scripts[$platform['js_src']] = "<script" . ">" . file_get_contents($platform['js_src']) . "</script>";
     }
   }
 
