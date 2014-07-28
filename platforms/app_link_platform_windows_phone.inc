@@ -7,8 +7,8 @@
 $plugin = array(
   'name' => t('Windows Phone App'),
   'match' => 'Windows Phone',
-  'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_windows_phone.js',
-  'js_callback' => 'app_link_platform_windows_phone',
+  'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_iphone.js',
+  'js_callback' => 'app_link_platform_iphone',
   'form' => 'app_link_platform_windows_phone_form',
 );
 
