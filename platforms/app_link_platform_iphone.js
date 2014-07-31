@@ -21,7 +21,7 @@ function app_link_platform_iphone(platform, web_url) {
   var supports_path = platform.supports_path;
   var supports_qs = platform.supports_qs;
   if (!app_url) {
-    document.location = fallback_url;
+    window.location = fallback_url;
   }
 
   // Fallback if they don't have app installed, wait, and try again.
@@ -29,12 +29,12 @@ function app_link_platform_iphone(platform, web_url) {
   var start = now();
   setTimeout(function () {
     if (now() - start < 3000) {
-      location.href = fallback_url;
+      window.location = fallback_url;
     }
   }, 2500);
 
   // Attempt to send to app
-  location.href = app_url;
+  window.location = app_url;
 
   /**
    * Apply configuration details to the app URL, including
