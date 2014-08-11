@@ -42,7 +42,7 @@ function app_link_platform_iphone_form(array $conf = array()) {
   $form['store_url'] = array(
     '#title' => t('App Store Url'),
     '#description' => t('URL to where the iPhone App lives in the App Store'),
-    '#attributes' => array('placeholder' => 'https://itunes.apple.com/us/app/'),
+    '#attributes' => array('placeholder' => 'itms://itunes.apple.com/us/app/'),
     '#type' => 'textfield',
     '#element_validate' => array('app_link_valid_url'),
     '#maxlength' => 2000,

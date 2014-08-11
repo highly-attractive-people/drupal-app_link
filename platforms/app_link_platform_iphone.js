@@ -1,5 +1,5 @@
 /**
- * Directs an iphone user to the Mobile App
+ * Directs user to the Mobile App
  * Alternatively, the app store if they don't have the App.
  *
  * @param {object} platform
@@ -24,17 +24,29 @@ function app_link_platform_iphone(platform, web_url) {
     window.location = fallback_url;
   }
 
-  // Fallback if they don't have app installed, wait, and try again.
-  var now = Date.now || function () { return (new Date()).getTime(); };
-  var start = now();
-  setTimeout(function () {
-    if (now() - start < 3000) {
+  setTimeout(fallback, 25);
+
+  tryIframeApproach();
+
+  /**
+   * Newer iOS versions complain about direct location
+   */
+  function tryIframeApproach() {
+    var iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
+    iframe.onload = fallback;
+    iframe.onerror = fallback;
+    iframe.src = app_url;
+  }
+
+  /**
+   * Fallback if they don't have app installed
+   */
+  function fallback () {
+    if (!document.webkitHidden) {
       window.location = fallback_url;
     }
-  }, 2500);
-
-  // Attempt to send to app
-  window.location = app_url;
+  }
 
   /**
    * Apply configuration details to the app URL, including
