@@ -47,7 +47,7 @@ function app_link_route () {
     if (platform.match && !UA.match(new RegExp(platform.match, 'i'))) {
       continue;
     }
-    // Validate if UA does not matche the platform's "match" expression.
+    // Validate if UA does not matches the platform's "match" expression.
     if (platform.not_match && UA.match(new RegExp(platform.not_match, 'i'))) {
       continue;
     }

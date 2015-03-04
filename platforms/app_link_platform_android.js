@@ -38,7 +38,7 @@ function app_link_platform_android(platform, web_url) {
   }
 
   /**
-   * Clear all previousliy set timers, we're done here ;)
+   * Clear all previously set timers, we're done here ;)
    */
   function clearTimers() {
     clearTimeout(timer_heartbeat);
@@ -47,7 +47,7 @@ function app_link_platform_android(platform, web_url) {
   }
 
   /**
-   * If PageVisiblityAPI has hidden in the page, we're good 
+   * If PageVisiblityAPI has hidden in the page, we're good
    */
   function intervalHeartbeat() {
     if (document.webkitHidden || document.hidden) {
