@@ -49,17 +49,6 @@ function app_link_platform_kindle_fire_form(array $conf = array()) {
     '#required' => FALSE,
     '#default_value' => isset($conf['store_url']) ? $conf['store_url'] : '',
   );
-  $form['supports_qs'] = array(
-    '#title' => t('Append the query string to the App\'s URL Scheme'),
-    '#description' => t("If checked, the query string will be appended the App's URL Scheme, example:\n/app_link/myapp?a=b&c=d\nmyapp://?a=b&c=d"),
-    '#type' => 'checkbox',
-    '#default_value' => isset($conf['supports_qs']) ? $conf['supports_qs'] : FALSE,
-  );
-  $form['supports_path'] = array(
-    '#title' => t('Append the "path" param to the App\'s URL Scheme'),
-    '#description' => t("If checked, we'll pass the 'path' query-string parameter will be appended to the App's URL Scheme, example:\n/app_link/myapp?path=/settings\nmyapp://settings"),
-    '#type' => 'checkbox',
-    '#default_value' => isset($conf['supports_path']) ? $conf['supports_path'] : FALSE,
-  );
+  app_link_qs_path_form($conf, $form);
   return $form;
 }
