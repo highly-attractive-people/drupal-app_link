@@ -57,6 +57,29 @@ function app_link_route () {
   window.location = WEB_URL;
 }
 
+/**
+ * Validate that path matches at least one regular expression in a whitelist.
+ *
+ * @param {string} path
+ *   The path to validate.
+ * @param {array} whitelist
+ *   An array of regular expression strings.
+ *
+ * @returns {boolean}
+ *   True if a match is found, false otherwise.
+ */
+function app_link_path_validate(path, whitelist) {
+  for (var index in whitelist) {
+    var regex = whitelist[index];
+    var re = new RegExp(regex);
+    if (re.test(path)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 app_link_route();
 
 </script>
