@@ -5,7 +5,7 @@
  * @param {object} platform
  *   Device platform to direct the user to, contains:
  *   {string} platform.app_url
- *      URL Scheme to the app 
+ *      URL Scheme to the app
  *   {string} platform.store_url
  *      URL of the store page to go to, if app is not installed
  *   {boolean} platform.supports_path
