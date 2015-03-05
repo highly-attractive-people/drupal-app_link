@@ -54,9 +54,28 @@ function app_link_platform_iphone(platform, web_url) {
    */
   function getAppUrl () {
     var app_url = platform.app_url;
-    app_url += platform.supports_path ? (getQueryParams().path || '') : '';
+    app_url += getFilteredPath();
     app_url += platform.supports_qs ? (location.search || '') :  '';
+
     return app_url;
+  }
+
+  /**
+   * Get the path if it exists and is whitelisted.
+   *
+   * @returns {string}
+   *   A string of the path, or an empty string if the path is missing, not
+   *   supported, or invalid.
+   */
+  function getFilteredPath() {
+    if (platform.supports_path) {
+      var path = getQueryParams().path;
+      if (app_link_path_validate(path, platform.path_whitelist)) {
+        return path;
+      }
+    }
+
+    return '';
   }
 
   /**
