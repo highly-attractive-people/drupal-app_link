@@ -19,7 +19,8 @@
 function app_link_platform_android(platform, web_url) {
   var fallback_url = platform.store_url || web_url;
   var app_url = getAppUrl();
-  var intent_url = platform.intent_url;
+
+  var intent_url = getIntentUrl();
   var UA = navigator.userAgent;
   if (!app_url) {
     document.location = fallback_url;
@@ -96,9 +97,49 @@ function app_link_platform_android(platform, web_url) {
    */
   function getAppUrl () {
     var app_url = platform.app_url;
-    app_url += platform.supports_path ? (getQueryParams().path || '') : '';
+    app_url += getFilteredPath();
     app_url += platform.supports_qs ? (location.search || '') :  '';
+
     return app_url;
+  }
+
+  /**
+   * Get the path if it exists and is whitelisted.
+   *
+   * @returns {string}
+   *   A string of the path, or an empty string if the path is missing, not
+   *   supported, or invalid.
+   */
+  function getFilteredPath() {
+    if (platform.supports_path) {
+      var path = getQueryParams().path;
+      if (app_link_path_validate(path, platform.path_whitelist)) {
+        return path;
+      }
+    }
+
+    return '';
+  }
+
+  /**
+   * Get the intent URL, replacing any path with one specified in the path
+   * query string.
+   *
+   * @returns {string}
+   *   Returns an intent:// URL.
+   */
+  function getIntentUrl() {
+    var intent = platform.intent_url;
+    var path = getFilteredPath();
+    if (!path) {
+      return intent;
+    }
+
+    // Replace the path specified in the intent with whatever was passed in.
+    var parser = document.createElement('a');
+    parser.href = intent;
+
+    return parser.protocol + '//' + path + parser.hash;
   }
 
   /**
