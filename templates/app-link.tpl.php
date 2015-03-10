@@ -66,9 +66,13 @@ function app_link_route () {
  *   An array of regular expression strings.
  *
  * @returns {boolean}
- *   True if a match is found, false otherwise.
+ *   True if a match is found or if whitelist is empty. False otherwise.
  */
 function app_link_path_validate(path, whitelist) {
+  if (whitelist.length == 0) {
+    return true;
+  }
+
   for (var index in whitelist) {
     var regex = whitelist[index];
     var re = new RegExp(regex);

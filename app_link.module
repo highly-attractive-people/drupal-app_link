@@ -224,7 +224,7 @@ function app_link_qs_path_form(array $conf, array &$form) {
     '#title' => t('Whitelisted app paths'),
     '#description' => t('JavaScript regular expressions, one per line, without leading or trailing slashes, that describe allowed paths within a URL or intent. Paths that do not match will not be redirected to. Do not whitelist all paths, as that could allow open redirects if an app is vulnerable.'),
     '#type' => 'textarea',
-    '#default_value' => $conf['path_whitelist'],
+    '#default_value' => isset($conf['path_whitelist']) ? $conf['path_whitelist'] : '',
   );
 }
 
