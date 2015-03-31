@@ -43,6 +43,7 @@ function app_link_theme($existing, $type, $theme, $path) {
  * Prints html file by bypassing page.tpl.php.
  */
 function app_link_bounce($applink) {
+  $applink = app_link_process_applink($applink);
   $platform_data = $applink->platform_data;
   $fallback_url = app_link_get_fallback_url($applink);
 
@@ -60,14 +61,6 @@ function app_link_bounce($applink) {
     if (!empty($platform['js_src']) && empty($scripts[$platform['js_src']])) {
       $scripts[$platform['js_src']] = "<script" . ">" . file_get_contents($platform['js_src']) . "</script>";
     }
-  }
-
-  // Explode our text field of whitelisted paths into an array.
-  foreach ($platform_data as &$data) {
-    if (empty($data['path_whitelist'])) {
-      continue;
-    }
-    $data['path_whitelist'] = explode("\r\n", $data['path_whitelist']);
   }
 
   drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
@@ -249,7 +242,17 @@ function app_link_get_fallback_url($applink) {
     $platform = $applink->platform_data[$platform_key];
     $uri = rtrim($platform['fallback_url'], '/');
     if (!empty($platform['supports_path']) && !empty($_GET['path'])) {
-      $uri .= '/' . $_GET['path'];
+      // See if there is at least one path white-listed.
+      $path_whitelist = $applink->platform_data[$platform_key]['path_whitelist'];
+      $path_param = $_GET['path'];
+      $whitelisted = array_reduce($path_whitelist, function ($carry, $item) use ($path_param) {
+        return $carry || preg_match('@' . preg_quote($item, '@') . '@', $path_param);
+      }, FALSE);
+      // If there are no paths to white-list, everything is accepted.
+      $whitelisted = $whitelisted || empty($path_whitelist);
+      if ($whitelisted) {
+        $uri .= $path_param;
+      }
     }
     $options = array(
       'absolute' => TRUE,
@@ -295,4 +298,26 @@ function app_link_parse_url($web_url) {
     $web_url .= '?' . $url_parts['query'];
   }
   return $web_url;
+}
+
+/**
+ * Processes the platform data.
+ *
+ * @param object $applink
+ *   The plugin content.
+ *
+ * @return object
+ *   The processed plugin content.
+ */
+function app_link_process_applink($applink) {
+  // Convert the path_whitelist to an array.
+  foreach ($applink->platform_data as &$data) {
+    if (empty($data['path_whitelist'])) {
+      $data['path_whitelist'] = array();
+      continue;
+    }
+    // Explode our text field of whitelisted paths into an array.
+    $data['path_whitelist'] = explode("\r\n", $data['path_whitelist']);
+  }
+  return $applink;
 }
