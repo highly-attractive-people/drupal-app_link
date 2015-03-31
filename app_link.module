@@ -96,6 +96,7 @@ function app_link_ctools_export_ui_form(&$form, &$form_state) {
 
   ctools_include('plugins');
   $platforms = ctools_get_plugins('app_link', 'platform');
+  uasort($platforms, 'ctools_plugin_sort');
   foreach ($platforms as $id => $platform) {
     if ($platform['form']) {
       $form_callback = $platform['form'];

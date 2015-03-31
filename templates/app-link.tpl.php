@@ -7,7 +7,7 @@
  * - $scripts: (array) Raw javascript strings from platform plugins.
  *
  * - $platform_info: (string) JSON-encoded object, containing data by platform:
- *   -  name: Proper name of an app on platform.
+ *   -  title: Proper name of an app on platform.
  *   -  match: RegExp that user-agent must match.
  *   -  not_match: RegExp that user-agent must not match.
  *   -  js_callback: Name of javascript function to call if matched.
