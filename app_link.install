@@ -107,6 +107,37 @@ function app_link_update_7102() {
         ->fields(array('platform_data' => serialize($platform_data)))
         ->condition('lid', $link->lid)
         ->execute();
-      }
+    }
   }
+}
+
+/**
+ * Move all the web_url data in the DB column to the corresponding platform.
+ */
+function app_link_update_7103() {
+  $links = db_query("SELECT * FROM {applink}");
+  foreach ($links as $link) {
+    $platform_data = unserialize($link->platform_data);
+    if (empty($link->web_url)) {
+      continue;
+    }
+    $web_url = app_link_parse_url($link->web_url);
+
+    $platform_data['app_link_platform_fallback'] = array(
+      'fallback_url' => $web_url,
+      'supports_qs' => TRUE,
+      'supports_path' => TRUE,
+      'path_whitelist' => '',
+    );
+
+    $link->platform_data = $platform_data;
+    drupal_write_record('applink', $link, 'lid');
+  }
+}
+
+/**
+ * Drop hardcoded fallback URL in favor of fallback platforms.
+ */
+function app_link_update_7104() {
+  db_drop_field('applink', 'web_url');
 }
