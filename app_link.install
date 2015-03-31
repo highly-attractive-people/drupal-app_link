@@ -42,13 +42,6 @@ function app_link_schema() {
         'default' => '',
         'description' => 'Unique name to refer to App.',
       ),
-      'web_url' => array(
-        'type' => 'varchar',
-        'length' => '2000',
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'URL a website of the app, Fallback if we can do nothing else.',
-      ),
       'platform_data' => array(
         'type' => 'text',
         'size' => 'big',

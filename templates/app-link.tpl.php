@@ -15,7 +15,7 @@
  * - $platform_data: (string) JSON-encoded object, containing data by platform:
  *    See plugin javascript for more information.
  *
- * - $web_url: (string) URL to fallback if we are unable to link to a platform.
+ * - $fallback_url: (string) URL to fallback if we are unable to link to a platform.
  */
 ?><!DOCTYPE html>
 <html>
@@ -32,7 +32,7 @@
 <script>
 var PLATFORM_INFO = <?php print $platform_info; ?>;
 var PLATFORM_DATA = <?php print $platform_data; ?>;
-var WEB_URL = <?php print $web_url; ?>;
+var FALLBACK_URL = <?php print $fallback_url; ?>;
 
 /**
  * Determine platform based on userAgent, and call it's hook.
@@ -51,10 +51,10 @@ function app_link_route () {
     if (platform.not_match && UA.match(new RegExp(platform.not_match, 'i'))) {
       continue;
     }
-    window[platform.js_callback](PLATFORM_DATA[id], WEB_URL);
+    window[platform.js_callback](PLATFORM_DATA[id], FALLBACK_URL);
     return true;
   }
-  window.location = WEB_URL;
+  window.location = FALLBACK_URL;
 }
 
 /**

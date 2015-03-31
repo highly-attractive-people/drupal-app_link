@@ -31,7 +31,6 @@ function app_link_theme($existing, $type, $theme, $path) {
       'variables' => array(
         'platform_info' => '',
         'platform_data' => '',
-        'web_url' => '',
         'scripts' => array(),
       ),
       'path' => $path . '/templates',
@@ -45,7 +44,7 @@ function app_link_theme($existing, $type, $theme, $path) {
  */
 function app_link_bounce($applink) {
   $platform_data = $applink->platform_data;
-  $web_url = $applink->web_url;
+  $fallback_url = app_link_get_fallback_url($applink);
 
   ctools_include('plugins');
   $platform_info = ctools_get_plugins('app_link', 'platform');
@@ -66,7 +65,7 @@ function app_link_bounce($applink) {
   print theme('app_link', array(
     'platform_info' => drupal_json_encode($platform_info),
     'platform_data' => drupal_json_encode($platform_data),
-    'web_url' => drupal_json_encode($web_url),
+    'fallback_url' => drupal_json_encode($fallback_url),
     'scripts' => $scripts,
   ));
 
@@ -91,17 +90,6 @@ function app_link_ctools_export_ui_form(&$form, &$form_state) {
     '#maxlength' => 255,
     '#required' => TRUE,
   );
-  $form['web_url'] = array(
-    '#default_value' => $applink->web_url,
-    '#title' => t('Fallback Web URL'),
-    '#description' => t('If we are unable to direct the user to an app or store, where shall we redirect them to?'),
-    '#type' => 'textfield',
-    '#element_validate' => array('app_link_valid_url'),
-    '#maxlength' => 2000,
-    '#required' => TRUE,
-  );
-  $platforms = module_invoke_all('app_platform_info');
-  $platform_data = $applink->platform_data;
   $form['platform_data'] = array(
     '#tree' => TRUE,
   );
