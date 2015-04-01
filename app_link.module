@@ -241,15 +241,12 @@ function app_link_get_fallback_url($applink) {
     }
     $platform = $applink->platform_data[$platform_key];
     $uri = rtrim($platform['fallback_url'], '/');
-    if (!empty($platform['supports_path']) && !empty($_GET['path'])) {
+    $qs = _app_link_get_qs_params();
+    if (!empty($platform['supports_path']) && !empty($qs['path'])) {
       // See if there is at least one path white-listed.
       $path_whitelist = $applink->platform_data[$platform_key]['path_whitelist'];
       $path_param = $_GET['path'];
-      $whitelisted = array_reduce($path_whitelist, function ($carry, $item) use ($path_param) {
-        return $carry || preg_match('@' . preg_quote($item, '@') . '@', $path_param);
-      }, FALSE);
-      // If there are no paths to white-list, everything is accepted.
-      $whitelisted = $whitelisted || empty($path_whitelist);
+      $whitelisted = _app_link_is_whitelisted($path_whitelist, $path_param);
       if ($whitelisted) {
         $uri .= $path_param;
       }
@@ -258,9 +255,7 @@ function app_link_get_fallback_url($applink) {
       'absolute' => TRUE,
     );
     if (!empty($platform['supports_qs'])) {
-      $qs = $_GET;
       unset($qs['path']);
-      unset($qs['q']);
       $options['query'] = $qs;
     }
 
@@ -270,7 +265,38 @@ function app_link_get_fallback_url($applink) {
 }
 
 /**
- * If the URL is fully qualified and points to nbc.com prod, then normalize it.
+ * Check if the provided path is whitelisted.
+ *
+ * @param array $path_whitelist
+ *   Array of whitelisted paths.
+ * @param string $path_param
+ *   The path to test.
+ *
+ * @return bool
+ *   TRUE if the path is whitelisted.
+ */
+function _app_link_is_whitelisted($path_whitelist, $path_param) {
+  $whitelisted = array_reduce($path_whitelist, function ($carry, $item) use ($path_param) {
+    return $carry || preg_match('@' . preg_quote($item, '@') . '@', $path_param);
+  }, FALSE);
+  // If there are no paths to white-list, everything is accepted.
+  return $whitelisted || empty($path_whitelist);
+}
+
+/**
+ * Get the query string params.
+ *
+ * @return array
+ *   An array of key value pairs for the query string values.
+ */
+function _app_link_get_qs_params() {
+  $params = $_GET;
+  unset($params['q']);
+  return $params;
+}
+
+/**
+ * If the URL is fully qualified and points to certain domains, normalize it.
  *
  * @param string $web_url
  *   The input URL.
@@ -279,7 +305,7 @@ function app_link_get_fallback_url($applink) {
  *   The output URL.
  */
 function app_link_parse_url($web_url) {
-  // If the link contains the www.nbc.com domain, then make it relative.
+  // If the link contains the domain within the variable, then make it relative.
   $url_parts = parse_url($web_url);
   $domains = variable_get('app_link_removable_domains', array());
   if (!empty($url_parts['host']) && !in_array($url_parts['host'], $domains)) {
