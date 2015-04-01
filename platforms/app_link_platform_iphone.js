@@ -12,11 +12,11 @@
  *     True if the App URL supports appending a path
  *   {boolean} platform.supports_qs
  *     True if the App URL supports appending a query-string
- * @param {string} web_url
+ * @param {string} fallback_url
  *    A fallback URL, if we can't direct the user somewhere better.
  */
-function app_link_platform_iphone(platform, web_url) {
-  var fallback_url = platform.store_url || web_url;
+function app_link_platform_iphone(platform, fallback_url) {
+  var fallback_url = platform.store_url || fallback_url;
   var app_url = getAppUrl();
   var supports_path = platform.supports_path;
   var supports_qs = platform.supports_qs;
