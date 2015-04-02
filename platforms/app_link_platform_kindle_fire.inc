@@ -5,7 +5,7 @@
  */
 
 $plugin = array(
-  'name' => t('Kindle Fire App'),
+  'title' => t('Kindle Fire App'),
   'match' => 'Kindle',
   'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_iphone.js',
   'js_callback' => 'app_link_platform_iphone',
