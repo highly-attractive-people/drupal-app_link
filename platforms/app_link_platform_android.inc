@@ -5,7 +5,7 @@
  */
 
 $plugin = array(
-  'name' => t('Android App'),
+  'title' => t('Android App'),
   'match' => 'Android',
   'not_match' => 'Kindle',
   'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_android.js',

@@ -5,7 +5,7 @@
  */
 
 $plugin = array(
-  'name' => t('iPhone App'),
+  'title' => t('iPhone App'),
   'match' => 'iPhone|iPod',
   'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_iphone.js',
   'js_callback' => 'app_link_platform_iphone',
