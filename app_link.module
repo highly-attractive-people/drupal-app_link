@@ -49,12 +49,6 @@ function app_link_bounce($applink) {
 
   ctools_include('plugins');
   $platform_info = ctools_get_plugins('app_link', 'platform');
-  // Remove the fallback plugins because those don't do client redirections.
-  // Those only provide data to generate the fallback URL for other platform
-  // plugins.
-  $platform_info = array_filter($platform_info, function ($platform_item_info) {
-    return empty($platform_item_info['fallback']);
-  });
   // Inline JavaScript for performance, we want 0 external requests.
   $scripts = array();
   foreach ($platform_info as $platform) {
@@ -63,12 +57,28 @@ function app_link_bounce($applink) {
     }
   }
 
+  // Allow other modules to hook and alter the data set.
+  $applink = array(
+    'platform_info' => $platform_info,
+    'platform_data' => $platform_data,
+    'fallback_url' => $fallback_url,
+    'scripts' => $scripts,
+  );
+  drupal_alter('applink_info', $applink);
+
+  // Remove the fallback plugins because those don't do client redirections.
+  // Those only provide data to generate the fallback URL for other platform
+  // plugins.
+  $applink['platform_info'] = array_filter($applink['platform_info'], function ($platform_item_info) {
+    return empty($platform_item_info['fallback']);
+  });
+
   drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
   print theme('app_link', array(
-    'platform_info' => drupal_json_encode($platform_info),
-    'platform_data' => drupal_json_encode($platform_data),
-    'fallback_url' => drupal_json_encode($fallback_url),
-    'scripts' => $scripts,
+    'platform_info' => drupal_json_encode($applink['platform_info']),
+    'platform_data' => drupal_json_encode($applink['platform_data']),
+    'fallback_url' => drupal_json_encode($applink['fallback_url']),
+    'scripts' => $applink['scripts'],
   ));
 
   // Do not just exit. Rather let Drupal run it's closure functions to
@@ -107,24 +117,7 @@ function app_link_ctools_export_ui_form(&$form, &$form_state) {
     }
   }
 
-  $form['#submit'] = array('app_link_ctools_export_ui_form_default_values') + (empty($form['#submit']) ? array() : $form['#submit']);
   return $form;
-}
-
-/**
- * Submit callback to add defaults for the app links based on the app link.
- */
-function app_link_ctools_export_ui_form_default_values($form, &$form_state) {
-  $platform_data = &$form_state['values']['platform_data'];
-  $defaults = module_invoke_all('app_link_default_link_values', array(
-    'platform_data' => $platform_data,
-    'path' => $form_state['values']['path'],
-  ));
-  foreach ($defaults as $platform_key => $default_values) {
-    foreach ($default_values as $form_key => $default_value) {
-      $platform_data[$platform_key][$form_key] = $default_value;
-    }
-  }
 }
 
 /**
@@ -298,7 +291,7 @@ function app_link_is_path_whitelisted($path, $whitelist) {
   // Check each item for a RegEx match.
   foreach ($whitelist as $item) {
     $rx = '@' . preg_quote($item, '@') . '@';
-    if (preg_match($regex, $path)) {
+    if (preg_match($rx, $path)) {
       return TRUE;
     }
   }
@@ -346,7 +339,7 @@ function app_link_parse_url($web_url) {
   if (!empty($url_parts['query'])) {
     $web_url .= '?' . $url_parts['query'];
   }
-  return $web_url;
+  return url($web_url, array('absolute' => TRUE));
 }
 
 /**
