@@ -113,7 +113,7 @@ function app_link_platform_android(platform, fallback_url) {
   function getFilteredPath() {
     if (platform.supports_path) {
       var path = getQueryParams().path;
-      if (app_link_path_validate(path, platform.path_whitelist)) {
+      if (app_link_is_path_whitelisted(path, platform.path_whitelist)) {
         return path;
       }
     }

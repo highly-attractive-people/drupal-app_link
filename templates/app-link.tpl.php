@@ -15,7 +15,7 @@
  * - $platform_data: (string) JSON-encoded object, containing data by platform:
  *    See plugin javascript for more information.
  *
- * - $fallback_url: (string) URL to fallback if we are unable to link to a platform.
+ * - $fallback_url: (string) URL to fallback if we cannot to link to a platform.
  */
 ?><!DOCTYPE html>
 <html>
@@ -68,15 +68,17 @@ function app_link_route () {
  * @returns {boolean}
  *   True if a match is found or if whitelist is empty. False otherwise.
  */
-function app_link_path_validate(path, whitelist) {
-  if (whitelist.length == 0) {
+function app_link_is_path_whitelisted(path, whitelist) {
+  // If there are no paths to white-list, everything is accepted.
+  if (!whitelist || !whitelist.length) {
     return true;
   }
 
-  for (var index in whitelist) {
-    var regex = whitelist[index];
-    var re = new RegExp(regex);
-    if (re.test(path)) {
+  // Check each item for a RegEx match.
+  for (var i = 0, item, rx; i < whitelist.length; i++) {
+    item = whitelist[i];
+    rx = new RegExp(item);
+    if (rx.test(path)) {
       return true;
     }
   }

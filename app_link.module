@@ -256,15 +256,13 @@ function app_link_get_fallback_url($applink) {
       continue;
     }
     $platform = $applink->platform_data[$platform_key];
-    $uri = rtrim($platform['fallback_url'], '/');
+    $uri = !empty($platform['fallback_url']) ? $platform['fallback_url'] : '';
     $qs = _app_link_get_qs_params();
     if (!empty($platform['supports_path']) && !empty($qs['path'])) {
       // See if there is at least one path white-listed.
-      $path_whitelist = $applink->platform_data[$platform_key]['path_whitelist'];
-      $path_param = $_GET['path'];
-      $whitelisted = _app_link_is_whitelisted($path_whitelist, $path_param);
+      $whitelisted = app_link_is_path_whitelisted($_GET['path'], $platform['path_whitelist']);
       if ($whitelisted) {
-        $uri .= $path_param;
+        $uri .= $_GET['path'];
       }
     }
     $options = array(
@@ -281,22 +279,31 @@ function app_link_get_fallback_url($applink) {
 }
 
 /**
- * Check if the provided path is whitelisted.
+ * Validate that path matches at least one regular expression in a whitelist.
  *
- * @param array $path_whitelist
- *   Array of whitelisted paths.
- * @param string $path_param
- *   The path to test.
+ * @param string $path
+ *   The path to validate.
+ * @param array $whitelist
+ *   An array of regular expression strings.
  *
  * @return bool
- *   TRUE if the path is whitelisted.
+ *   TRUE if a match is found or if whitelist is empty. False otherwise.
  */
-function _app_link_is_whitelisted($path_whitelist, $path_param) {
-  $whitelisted = array_reduce($path_whitelist, function ($carry, $item) use ($path_param) {
-    return $carry || preg_match('@' . preg_quote($item, '@') . '@', $path_param);
-  }, FALSE);
+function app_link_is_path_whitelisted($path, $whitelist) {
   // If there are no paths to white-list, everything is accepted.
-  return $whitelisted || empty($path_whitelist);
+  if (empty($whitelist)) {
+    return TRUE;
+  }
+
+  // Check each item for a RegEx match.
+  foreach ($whitelist as $item) {
+    $rx = '@' . preg_quote($item, '@') . '@';
+    if (preg_match($regex, $path)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
 }
 
 /**
