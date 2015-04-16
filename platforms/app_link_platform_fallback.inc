@@ -33,7 +33,7 @@ function app_link_platform_fallback_form(array $conf = array()) {
     '#description' => t('Absolute URL to redirect when there is no other match. Do not use the domain name.'),
     '#attributes' => array('placeholder' => '<permalink>'),
     '#type' => 'textfield',
-    '#element_validate' => array('valid_url'),
+    '#element_validate' => array('app_link_valid_url'),
     '#maxlength' => 2000,
     '#required' => FALSE,
     '#default_value' => isset($conf['fallback_url']) ? $conf['fallback_url'] : '',
@@ -56,4 +56,3 @@ function app_link_platform_fallback_form(array $conf = array()) {
   $form['supports_path']['#default_value'] = isset($conf['supports_path']) ? $conf['supports_qs'] : TRUE;
   return $form;
 }
-
