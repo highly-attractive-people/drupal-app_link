@@ -15,8 +15,9 @@
  * @param {string} fallback_url
  *    A fallback URL, if we can't direct the user somewhere better.
  */
+/*global app_link_is_path_whitelisted*/
 function app_link_platform_iphone(platform, fallback_url) {
-  var fallback_url = platform.store_url || fallback_url;
+  fallback_url = platform.store_url || fallback_url;
   var app_url = getAppUrl();
   var supports_path = platform.supports_path;
   var supports_qs = platform.supports_qs;
@@ -70,7 +71,7 @@ function app_link_platform_iphone(platform, fallback_url) {
   function getFilteredPath() {
     if (platform.supports_path) {
       var path = getQueryParams().path;
-      if (app_link_path_validate(path, platform.path_whitelist)) {
+      if (app_link_is_path_whitelisted(path, platform.path_whitelist)) {
         return path;
       }
     }
