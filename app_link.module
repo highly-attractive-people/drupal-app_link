@@ -74,10 +74,11 @@ function app_link_bounce($applink) {
   );
   drupal_alter('applink_info', $applink);
 
-  $no_fallback_url = url('', array('absolute' => TRUE));
+  $base_url = url('', array('absolute' => TRUE));
   if (!empty($applink['platform_data']['app_link_platform_fallback']['meta_fetch']) &&
     !empty($applink['fallback_url']) &&
-    ($applink['fallback_url'] !== $no_fallback_url)
+    // Security: Only grab metatags from this current site.
+    strpos($applink['fallback_url'], $base_url) === 0
   ) {
     $metatags = app_link_get_meta_tags($applink['fallback_url']);
     $applink['metatags'] = array_merge($applink['metatags'], $metatags);
