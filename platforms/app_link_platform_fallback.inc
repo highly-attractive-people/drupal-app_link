@@ -37,17 +37,6 @@ function app_link_platform_fallback_form(array $conf = array()) {
     '#maxlength' => 2000,
     '#required' => FALSE,
     '#default_value' => isset($conf['fallback_url']) ? $conf['fallback_url'] : '',
-    '#states' => array(
-      'invisible' => array(
-        ':input[name="platform_data[app_link_platform_fallback][override]"]' => array('checked' => FALSE),
-      ),
-    ),
-  );
-  $form['override'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Show path'),
-    '#description' => t('Show the text field to manually set the path.'),
-    '#default_value' => empty($conf['fallback_url']),
   );
   app_link_qs_path_form($conf, $form);
 
