@@ -60,8 +60,8 @@ function app_link_bounce($applink) {
   }
 
   $metatags = array(
-    '<meta charset="utf-8">',
-    '<title>' . t('Mobile App') . '</title>',
+    'charset' => '<meta charset="utf-8">',
+    'title' => '<title>' . t('Mobile App') . '</title>',
   );
 
   // Allow other modules to hook and alter the data set.
@@ -404,7 +404,7 @@ function app_link_get_meta_tags($url) {
 
   preg_match('/<title.+<\/title>/si', $head, $match2);
   if (!empty($match2[0])) {
-    $tags[] = $match2[0];
+    $tags['title'] = $match2[0];
   }
 
   // Grab Meta tags and Link canonical.
