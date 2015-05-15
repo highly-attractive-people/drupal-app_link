@@ -39,9 +39,5 @@ function app_link_platform_fallback_form(array $conf = array()) {
     '#default_value' => isset($conf['fallback_url']) ? $conf['fallback_url'] : '',
   );
   app_link_qs_path_form($conf, $form);
-
-  // Support qs and path by default.
-  $form['supports_qs']['#default_value'] = isset($conf['supports_qs']) ? $conf['supports_qs'] : TRUE;
-  $form['supports_path']['#default_value'] = isset($conf['supports_path']) ? $conf['supports_qs'] : TRUE;
   return $form;
 }
