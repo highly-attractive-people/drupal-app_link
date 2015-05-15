@@ -37,22 +37,13 @@ function app_link_platform_fallback_form(array $conf = array()) {
     '#maxlength' => 2000,
     '#required' => FALSE,
     '#default_value' => isset($conf['fallback_url']) ? $conf['fallback_url'] : '',
-    '#states' => array(
-      'invisible' => array(
-        ':input[name="platform_data[app_link_platform_fallback][override]"]' => array('checked' => FALSE),
-      ),
-    ),
   );
-  $form['override'] = array(
+  $form['meta_fetch'] = array(
+    '#title' => t('Acquire Meta Tags from Fallback'),
+    '#description' => t('Request metatags from Fallback URL on App Link page.'),
     '#type' => 'checkbox',
-    '#title' => t('Show path'),
-    '#description' => t('Show the text field to manually set the path.'),
-    '#default_value' => empty($conf['fallback_url']),
+    '#default_value' => isset($conf['meta_fetch']) ? $conf['meta_fetch'] : FALSE,
   );
   app_link_qs_path_form($conf, $form);
-
-  // Support qs and path by default.
-  $form['supports_qs']['#default_value'] = isset($conf['supports_qs']) ? $conf['supports_qs'] : TRUE;
-  $form['supports_path']['#default_value'] = isset($conf['supports_path']) ? $conf['supports_qs'] : TRUE;
   return $form;
 }

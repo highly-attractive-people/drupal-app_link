@@ -20,8 +20,9 @@
 ?><!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<title><?php print t('Mobile App'); ?></title>
+<?php foreach ($metatags as $metatag) : ?>
+  <?php print $metatag ?>
+<?php endforeach; ?>
 </head>
 <body>
 

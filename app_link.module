@@ -31,7 +31,9 @@ function app_link_theme($existing, $type, $theme, $path) {
       'variables' => array(
         'platform_info' => '',
         'platform_data' => '',
+        'fallback_url' => '',
         'scripts' => array(),
+        'metatags' => array(),
       ),
       'path' => $path . '/templates',
       'template' => 'app-link',
@@ -57,14 +59,30 @@ function app_link_bounce($applink) {
     }
   }
 
+  $metatags = array(
+    'charset' => '<meta charset="utf-8">',
+    'title' => '<title>' . t('Mobile App') . '</title>',
+  );
+
   // Allow other modules to hook and alter the data set.
   $applink = array(
     'platform_info' => $platform_info,
     'platform_data' => $platform_data,
     'fallback_url' => $fallback_url,
     'scripts' => $scripts,
+    'metatags' => $metatags,
   );
   drupal_alter('applink_info', $applink);
+
+  $base_url = url('', array('absolute' => TRUE));
+  if (!empty($applink['platform_data']['app_link_platform_fallback']['meta_fetch']) &&
+    !empty($applink['fallback_url']) &&
+    // Security: Only grab metatags from this current site.
+    strpos($applink['fallback_url'], $base_url) === 0
+  ) {
+    $metatags = app_link_get_meta_tags($applink['fallback_url']);
+    $applink['metatags'] = array_merge($applink['metatags'], $metatags);
+  }
 
   // Remove the fallback plugins because those don't do client redirections.
   // Those only provide data to generate the fallback URL for other platform
@@ -79,6 +97,7 @@ function app_link_bounce($applink) {
     'platform_data' => drupal_json_encode($applink['platform_data']),
     'fallback_url' => drupal_json_encode($applink['fallback_url']),
     'scripts' => $applink['scripts'],
+    'metatags' => $applink['metatags'],
   ));
 
   // Do not just exit. Rather let Drupal run it's closure functions to
@@ -362,4 +381,44 @@ function app_link_process_applink($applink) {
     $data['path_whitelist'] = explode("\r\n", $data['path_whitelist']);
   }
   return $applink;
+}
+
+/**
+ * Gets a list Metatags from target page.
+ *
+ * @param string $url
+ *   Url to extract Metatags from.
+ *
+ * @return array
+ *   Array of html strings.
+ */
+function app_link_get_meta_tags($url) {
+  $tags = array();
+  $contents = @file_get_contents($url);
+
+  preg_match('/<head.+<\/head>/sim', $contents, $match1);
+  if (empty($match1)) {
+    return;
+  }
+  $head = $match1[0];
+
+  preg_match('/<title.+<\/title>/si', $head, $match2);
+  if (!empty($match2[0])) {
+    $tags['title'] = $match2[0];
+  }
+
+  // Grab Meta tags and Link canonical.
+  preg_match_all('/<(meta|link) [^>]+>/si', $head, $match3);
+  if (!empty($match3[0])) {
+    foreach ($match3[0] as $tag) {
+      // Filter presentation tags out.
+      if (strpos($tag, 'rel="stylesheet"') === FALSE &&
+        strpos($tag, 'charset=') === FALSE &&
+        strpos($tag, 'viewport') === FALSE) {
+        $tags[] = $tag;
+      }
+    }
+  }
+
+  return $tags;
 }
