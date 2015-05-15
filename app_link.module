@@ -31,7 +31,9 @@ function app_link_theme($existing, $type, $theme, $path) {
       'variables' => array(
         'platform_info' => '',
         'platform_data' => '',
+        'fallback_url' => '',
         'scripts' => array(),
+        'metatags' => array(),
       ),
       'path' => $path . '/templates',
       'template' => 'app-link',
@@ -57,12 +59,18 @@ function app_link_bounce($applink) {
     }
   }
 
+  $metatags = array(
+    '<meta charset="utf-8">',
+    '<title>' . t('Mobile App') . '</title>',
+  );
+
   // Allow other modules to hook and alter the data set.
   $applink = array(
     'platform_info' => $platform_info,
     'platform_data' => $platform_data,
     'fallback_url' => $fallback_url,
     'scripts' => $scripts,
+    'metatags' => $metatags,
   );
   drupal_alter('applink_info', $applink);
 
@@ -79,6 +87,7 @@ function app_link_bounce($applink) {
     'platform_data' => drupal_json_encode($applink['platform_data']),
     'fallback_url' => drupal_json_encode($applink['fallback_url']),
     'scripts' => $applink['scripts'],
+    'metatags' => $applink['metatags'],
   ));
 
   // Do not just exit. Rather let Drupal run it's closure functions to
