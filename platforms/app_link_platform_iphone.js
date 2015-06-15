@@ -24,10 +24,11 @@ function app_link_platform_iphone(platform, fallback_url) {
   if (!app_url) {
     window.location = fallback_url;
   }
+  else {
+    setTimeout(fallback, 25);
 
-  setTimeout(fallback, 25);
-
-  tryIframeApproach();
+    tryIframeApproach();
+  }
 
   /**
    * Newer iOS versions complain about direct location
