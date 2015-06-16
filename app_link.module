@@ -7,6 +7,62 @@
  */
 
 /**
+ * Implements hook_help().
+ */
+function app_link_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#app_link':
+      $help_html = '';
+      $help_html .= '<p>' . t('This module will allow you to create empty placeholder pages in your Drupal site, that redirect to the appropriate App depending on the client that placeholder page is opened in.') . '</p>';
+
+      $help_html .= '<p>' . t('In some sense this module allows the Drupal site to bridge the users to the best digital experience supported by your project.') . '</p>';
+
+      $help_html .= '<h2 id="examples">' . t('Examples') . '</h2>';
+
+      $help_html .= '<p>' . t('Imagine the following scenario, your digital project has a Drupal website and an Android and iOS app. Then you can create an app_link, for instance <em>https://www.example.org/app</em>. You can share that link in all of your distribution channels (social media, advertisements, …), and when a user loads that link:') . '</p>';
+
+      $help_html .= '<ul>';
+      $help_html .= '<li>' . t('app_link will check if the user&#8217;s client is supported. If it&#8217;s not supported, it will redirect them to the fallback URL. The fallback URL is typically a URL in your Drupal site.') . '</li>';
+      $help_html .= '<li>' . t('If the client is supported it will try to open the configured app URI. That means that the app will be fired in the device pointing to the correct page.') . '</li>';
+      $help_html .= '<li>' . t('If the client is supported, but the app is not installed the user will be redirected to the configured app store URL.') . '</li>';
+      $help_html .= '</ul>';
+
+      $help_html .= '<h2 id="options">' . t('Options') . '</h2>';
+
+      $help_html .= '<p>' . t('There are several options that will let you configure the way the public link (<em>https://www.example.org/app</em>) interacts with the app URIs.') . '</p>';
+
+      $help_html .= '<h3 id="query_string">' . t('Query String') . '</h3>';
+
+      $help_html .= '<p>' . t('By checking <em>Append the query string to the App&#8217;s URL Scheme</em> app_link will send all of the query string parameters present in the public link, to the app URI.') . '</p>';
+
+      $help_html .= '<p>' . t('In the case of our example, if we have an Android URI of <em>intent://root</em>, when we send an Android user to <em>https://www.example.org/app?foo=bar&amp;baz=oof</em> they will be redirected to <em>intent://root?foo=bar&amp;baz=oof</em>.') . '</p>';
+
+      $help_html .= '<p>' . t('This option is useful to pass in dynamic behaviors to the apps, like opening the search page for a search term directly in the app.') . '</p>';
+
+      $help_html .= '<h3 id="dynamic_paths">' . t('Dynamic paths') . '</h3>';
+
+      $help_html .= '<p>' . t('By checking <em>Append the &#8220;path&#8221; param to the App&#8217;s URL Scheme</em> the string in the <em>path</em> query string parameter in the public URL will be added to the path for the app links.') . '</p>';
+
+      $help_html .= '<p>' . t('Linking users to <em>https://www.example.org/app?path=/node/23443</em> will have the effect of redirecting the Android users to <em>intent://root/node/23443</em>. If the fallback was configured to be <em>https://www.example.org</em>, then the user will be redirected to <em>https://www.example.org/node/23443</em> if that device is not supported.') . '</p>';
+
+      $help_html .= '<h2 id="extending">' . t('Extending') . '</h2>';
+
+      $help_html .= '<p>' . t('This module ships with support for the web fallback and the following platforms:') . '</p>';
+
+      $help_html .= '<ul>';
+      $help_html .= '<li>' . t('Android') . '</li>';
+      $help_html .= '<li>' . t('iPad') . '</li>';
+      $help_html .= '<li>' . t('iPhone') . '</li>';
+      $help_html .= '<li>' . t('Kindle Fire') . '</li>';
+      $help_html .= '<li>' . t('Windows Phone') . '</li>';
+      $help_html .= '</ul>';
+
+      $help_html .= '<p>' . t('If you need to support other platforms, you can add one in a custom module. Every platform is a CTools plugin and a JavaScript file. Use one of the existing platforms as an example to build your own.') . '</p>';
+      return $help_html;
+  }
+}
+
+/**
  * Implements hook_menu().
  */
 function app_link_menu() {
