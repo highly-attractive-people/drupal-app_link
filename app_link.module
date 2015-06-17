@@ -13,18 +13,18 @@ function app_link_help($path, $arg) {
   switch ($path) {
     case 'admin/help#app_link':
       $help_html = '';
-      $help_html .= '<p>' . t('This module will allow you to create empty placeholder pages in your Drupal site, that redirect to the appropriate App depending on the client that placeholder page is opened in.') . '</p>';
+      $help_html .= '<p>' . t('This module will allow you to create empty placeholder pages in your Drupal site. These placeholder pages will redirect users to the appropriate App or App Store according to the user&#8217;s device (iPhone, Android, …).') . '</p>';
 
-      $help_html .= '<p>' . t('In some sense this module allows the Drupal site to bridge the users to the best digital experience supported by your project.') . '</p>';
+      $help_html .= '<p>' . t('In some sense, this module allows the Drupal site to bridge the user to the best digital experience supported by your project.') . '</p>';
 
       $help_html .= '<h2 id="examples">' . t('Examples') . '</h2>';
 
-      $help_html .= '<p>' . t('Imagine the following scenario, your digital project has a Drupal website and an Android and iOS app. Then you can create an app_link, for instance <em>https://www.example.org/app</em>. You can share that link in all of your distribution channels (social media, advertisements, …), and when a user loads that link:') . '</p>';
+      $help_html .= '<p>' . t('Imagine the following scenario, your digital project has a Drupal website, an Android and an iOS app. Then you can create an app_link, for instance <em>https://www.example.org/app</em>. You can share that link in all of your distribution channels (social media, advertisements, …). Then a user goes to that link:') . '</p>';
 
       $help_html .= '<ul>';
-      $help_html .= '<li>' . t('app_link will check if the user&#8217;s client is supported. If it&#8217;s not supported, it will redirect them to the fallback URL. The fallback URL is typically a URL in your Drupal site.') . '</li>';
-      $help_html .= '<li>' . t('If the client is supported it will try to open the configured app URI. That means that the app will be fired in the device pointing to the correct page.') . '</li>';
-      $help_html .= '<li>' . t('If the client is supported, but the app is not installed the user will be redirected to the configured app store URL.') . '</li>';
+      $help_html .= '<li>' . t('app_link will check if the user&#8217;s device is supported. If it&#8217;s not supported, it will redirect them to the fallback URL. The fallback URL is typically a URL in your Drupal site.') . '</li>';
+      $help_html .= '<li>' . t('If the device is supported it will try to open the configured app URI. That means that the app will be fired in the device pointing to the correct page.') . '</li>';
+      $help_html .= '<li>' . t('If the device is supported, but the app is not installed the user will be redirected to the configured app store URL.') . '</li>';
       $help_html .= '</ul>';
 
       $help_html .= '<h2 id="options">' . t('Options') . '</h2>';
@@ -50,11 +50,13 @@ function app_link_help($path, $arg) {
       $help_html .= '<p>' . t('This module ships with support for the web fallback and the following platforms:') . '</p>';
 
       $help_html .= '<ul>';
-      $help_html .= '<li>' . t('Android') . '</li>';
-      $help_html .= '<li>' . t('iPad') . '</li>';
-      $help_html .= '<li>' . t('iPhone') . '</li>';
-      $help_html .= '<li>' . t('Kindle Fire') . '</li>';
-      $help_html .= '<li>' . t('Windows Phone') . '</li>';
+
+      ctools_include('plugins');
+      $platforms_info = ctools_get_plugins('app_link', 'platform');
+
+      foreach ($platforms_info as $platform_info) {
+        $help_html .= '<li>' . $platform_info['title'] . '</li>';
+      }
       $help_html .= '</ul>';
 
       $help_html .= '<p>' . t('If you need to support other platforms, you can add one in a custom module. Every platform is a CTools plugin and a JavaScript file. Use one of the existing platforms as an example to build your own.') . '</p>';
