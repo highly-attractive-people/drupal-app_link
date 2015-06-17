@@ -7,7 +7,7 @@
 $plugin = array(
   'title' => t('Android App'),
   'match' => 'Android',
-  'not_match' => 'Kindle',
+  'not_match' => 'Kindle|Windows Phone',
   'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_android.js',
   'js_callback' => 'app_link_platform_android',
   'form' => 'app_link_platform_android_form',

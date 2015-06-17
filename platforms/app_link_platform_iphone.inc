@@ -7,6 +7,7 @@
 $plugin = array(
   'title' => t('iPhone App'),
   'match' => 'iPhone|iPod',
+  'not_match' => 'Windows Phone',
   'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_iphone.js',
   'js_callback' => 'app_link_platform_iphone',
   'form' => 'app_link_platform_iphone_form',
