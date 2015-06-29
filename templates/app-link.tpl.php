@@ -23,6 +23,9 @@
 <?php foreach ($metatags as $metatag) : ?>
   <?php print $metatag ?>
 <?php endforeach; ?>
+<?php if (isset($fallback_url)): ?>
+  <link rel="canonical" href="<?php print $canonical_link; ?>" />
+<?php endif; ?>
 </head>
 <body>
 
@@ -31,9 +34,22 @@
 <?php endforeach; ?>
 
 <script>
+var REFERRER = document.referrer;
 var PLATFORM_INFO = <?php print $platform_info; ?>;
 var PLATFORM_DATA = <?php print $platform_data; ?>;
 var FALLBACK_URL = <?php print $fallback_url; ?>;
+
+// Check and see if 'referrer is already a part of the fallback URL.
+// If it isn't, then check to see there is already a querystring. Then
+// add REFERRER based on that result.
+if (FALLBACK_URL.indexOf('referrer') == -1 && REFERRER.length > 0) {
+  if (FALLBACK_URL.indexOf('?') > -1) {
+    FALLBACK_URL = FALLBACK_URL + '&referrer=' + REFERRER;
+  }
+  else {
+    FALLBACK_URL = FALLBACK_URL + '?referrer=' + REFERRER;
+  }
+}
 
 /**
  * Determine platform based on userAgent, and call it's hook.
@@ -52,7 +68,7 @@ function app_link_route () {
     if (platform.not_match && UA.match(new RegExp(platform.not_match, 'i'))) {
       continue;
     }
-    window[platform.js_callback](PLATFORM_DATA[id], FALLBACK_URL);
+    window[platform.js_callback](PLATFORM_DATA[id], FALLBACK_URL, REFERRER);
     return true;
   }
   window.location = FALLBACK_URL;
