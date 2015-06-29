@@ -23,9 +23,6 @@
 <?php foreach ($metatags as $metatag) : ?>
   <?php print $metatag ?>
 <?php endforeach; ?>
-<?php if (isset($fallback_url)): ?>
-  <link rel="canonical" href="<?php print $canonical_link; ?>" />
-<?php endif; ?>
 </head>
 <body>
 
