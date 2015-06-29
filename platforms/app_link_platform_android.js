@@ -17,9 +17,31 @@
  *    A fallback URL, if we can't direct the user somewhere better.
  */
 /*global app_link_is_path_whitelisted*/
-function app_link_platform_android(platform, fallback_url) {
+function app_link_platform_android(platform, fallback_url, referrer) {
   fallback_url = platform.store_url || fallback_url;
   var app_url = getAppUrl();
+
+  /*
+   * Attaches the referrer to the destination URL.
+   */
+  function attachReferrer(url, referrer) {
+    var destURL = url;
+    if (destURL.indexOf('referrer') == -1 && referrer.length > 0) {
+      if (destURL.indexOf('?') > -1) {
+        destURL = destURL + '&referrer=' + referrer;
+      }
+      else {
+        destURL = destURL + '?referrer=' + referrer;
+      }
+      return destURL;
+    }
+  }
+
+  // Attach 'referrer' to URLs if necessary.
+  if (referrer) {
+    fallback_url = attachReferrer(fallback_url, referrer);
+    app_url = attachReferrer(app_url, referrer);
+  }
 
   var intent_url = getIntentUrl();
   var UA = navigator.userAgent;
