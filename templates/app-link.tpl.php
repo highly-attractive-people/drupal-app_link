@@ -16,6 +16,8 @@
  *    See plugin javascript for more information.
  *
  * - $fallback_url: (string) URL to fallback if we cannot to link to a platform.
+ *
+ * - $canonical_link: (string) URL to send web crawlers to for full detail.
  */
 ?><!DOCTYPE html>
 <html>
@@ -24,6 +26,9 @@
   <?php print $metatag ?>
 <?php endforeach; ?>
 </head>
+<?php if (isset($canonical_link)): ?>
+  <link rel="canonical" href="<?php print $canonical_link; ?>" />
+<?php endif; ?>
 <body>
 
 <?php foreach ($scripts as $script) : ?>
