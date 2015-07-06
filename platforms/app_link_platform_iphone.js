@@ -27,30 +27,31 @@ function app_link_platform_iphone(platform, fallback_url, referrer) {
     var destURL = url;
     if (destURL.indexOf('referrer') == -1 && referrer.length > 0) {
       if (destURL.indexOf('?') > -1) {
-        destURL = destURL + '&referrer=' + referrer;
+        destURL = destURL + '&referrer=' + encodeURIComponent(referrer);
       }
       else {
-        destURL = destURL + '?referrer=' + referrer;
+        destURL = destURL + '?referrer=' + encodeURIComponent(referrer);
       }
       return destURL;
     }
   }
-
   // Attach 'referrer' to URLs if necessary.
-  if (referrer) {
+  if (referrer && platform.supports_qs) {
     fallback_url = attachReferrer(fallback_url, referrer);
     app_url = attachReferrer(app_url, referrer);
   }
 
   var supports_path = platform.supports_path;
   var supports_qs = platform.supports_qs;
+
   if (!app_url) {
     window.location = fallback_url;
   }
+  else {
+    setTimeout(fallback, 25);
 
-  setTimeout(fallback, 25);
-
-  tryIframeApproach();
+    tryIframeApproach();
+  }
 
   /**
    * Newer iOS versions complain about direct location

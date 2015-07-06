@@ -41,10 +41,10 @@ var FALLBACK_URL = <?php print $fallback_url; ?>;
 // add REFERRER based on that result.
 if (FALLBACK_URL.indexOf('referrer') == -1 && REFERRER.length > 0) {
   if (FALLBACK_URL.indexOf('?') > -1) {
-    FALLBACK_URL = FALLBACK_URL + '&referrer=' + REFERRER;
+    FALLBACK_URL = FALLBACK_URL + '&referrer=' + encodeURIComponent(REFERRER);
   }
   else {
-    FALLBACK_URL = FALLBACK_URL + '?referrer=' + REFERRER;
+    FALLBACK_URL = FALLBACK_URL + '?referrer=' + encodeURIComponent(REFERRER);
   }
 }
 
