@@ -17,31 +17,9 @@
  *    A fallback URL, if we can't direct the user somewhere better.
  */
 /*global app_link_is_path_whitelisted*/
-function app_link_platform_android(platform, fallback_url, referrer) {
+function app_link_platform_android(platform, fallback_url) {
   fallback_url = platform.store_url || fallback_url;
   var app_url = getAppUrl();
-
-  /*
-   * Attaches the referrer to the destination URL.
-   */
-  function attachReferrer(url, referrer) {
-    var destURL = url;
-    if (destURL.indexOf('referrer') == -1 && referrer.length > 0) {
-      if (destURL.indexOf('?') > -1) {
-        destURL = destURL + '&referrer=' + encodeURIComponent(referrer);
-      }
-      else {
-        destURL = destURL + '?referrer=' + encodeURIComponent(referrer);
-      }
-      return destURL;
-    }
-  }
-
-  // Attach 'referrer' to URLs if necessary.
-  if (referrer && platform.supports_qs) {
-    fallback_url = attachReferrer(fallback_url, referrer);
-    app_url = attachReferrer(app_url, referrer);
-  }
 
   var intent_url = getIntentUrl();
   var UA = navigator.userAgent;
@@ -121,8 +99,12 @@ function app_link_platform_android(platform, fallback_url, referrer) {
   function getAppUrl () {
     var app_url = platform.app_url;
     app_url += getFilteredPath();
-    app_url += platform.supports_qs ? (location.search || '') :  '';
-
+    if (platform.supports_qs) {
+      // Pass-Through Query-String values.
+      app_url = app_link_set_qs(app_url, location.search && location.search.slice(1));
+      // Attempt to set a referrer.
+      app_url = app_link_set_referrer(app_url);
+    }
     return app_url;
   }
 
