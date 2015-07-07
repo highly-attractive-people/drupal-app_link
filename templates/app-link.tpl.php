@@ -25,10 +25,10 @@
 <?php foreach ($metatags as $metatag) : ?>
   <?php print $metatag ?>
 <?php endforeach; ?>
-</head>
 <?php if (isset($canonical_link)): ?>
   <link rel="canonical" href="<?php print $canonical_link; ?>" />
 <?php endif; ?>
+</head>
 <body>
 
 <?php foreach ($scripts as $script) : ?>
