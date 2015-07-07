@@ -99,8 +99,12 @@ function app_link_platform_android(platform, fallback_url) {
   function getAppUrl () {
     var app_url = platform.app_url;
     app_url += getFilteredPath();
-    app_url += platform.supports_qs ? (location.search || '') :  '';
-
+    if (platform.supports_qs) {
+      // Pass-Through Query-String values.
+      app_url = app_link_set_qs(app_url, location.search && location.search.slice(1));
+      // Attempt to set a referrer.
+      app_url = app_link_set_referrer(app_url);
+    }
     return app_url;
   }
 

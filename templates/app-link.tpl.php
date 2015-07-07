@@ -46,7 +46,10 @@ var FALLBACK_URL = <?php print $fallback_url; ?>;
  */
 function app_link_route () {
   var UA = navigator.userAgent;
-  var platform;
+  var platform = PLATFORM_DATA.app_link_platform_fallback;
+  if (platform && platform.supports_qs) {
+    FALLBACK_URL = app_link_set_referrer(FALLBACK_URL);
+  }
   for (var id in PLATFORM_INFO) {
     platform = PLATFORM_INFO[id];
     // Validate if UA matches the platform's "match" expression.
@@ -61,6 +64,35 @@ function app_link_route () {
     return true;
   }
   window.location = FALLBACK_URL;
+}
+
+/**
+ * Attaches the referrer to a destination URL.
+ *
+ * @param {string} url
+ *   The URL to apply transformation.
+ *
+ * @return {string}
+ *   The transformed URL.
+ */
+function app_link_set_referrer(url) {
+  if (document.referrer && url.indexOf('referrer') === -1) {
+    url = app_link_set_qs(url, 'referrer=' + encodeURIComponent(document.referrer));
+  }
+  return url;
+}
+
+/**
+ * Apply a query-string to a destination URL.
+ *
+ * @param {string} url
+ *   The URL to apply transformation.
+ *
+ * @return {string}
+ *   The transformed URL.
+ */
+function app_link_set_qs(url, qs) {
+  return url + (qs ? (url.indexOf('?') > -1 ? '&' : '?') + qs : '');
 }
 
 /**
