@@ -3,6 +3,7 @@
  * @file
  * App Link plugin to define Android App.
  */
+global $language;
 
 $plugin = array(
   'title' => t('Android App'),
@@ -11,6 +12,8 @@ $plugin = array(
   'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_android.js',
   'js_callback' => 'app_link_platform_android',
   'form' => 'app_link_platform_android_form',
+  'badge_url' => '//developer.android.com/images/brand/' . $language->language . '_generic_rgb_wo_60.png',
+  'store_text' => t('Get it on Google Play'),
 );
 
 /**

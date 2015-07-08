@@ -28,8 +28,20 @@
 <?php if (isset($canonical_link)): ?>
   <link rel="canonical" href="<?php print $canonical_link; ?>" />
 <?php endif; ?>
+<style type="text/css">
+.app-store-badges { text-align: center; }
+.app-store-badges .hidden { display: none; }
+</style>
 </head>
 <body>
+
+<div class="app-store-badges">
+   <?php foreach ($store_badges as $platform_id => $badge) : ?>
+     <a id="<?php print $platform_id ?>" href="<?php print $badge['store_url']; ?>" class="hidden">
+       <img alt="<?php print $badge['store_text']; ?>" src="<?php print $badge['badge_url']; ?>">
+     </a>
+   <?php endforeach; ?>
+</div>
 
 <?php foreach ($scripts as $script) : ?>
   <?php print $script ?>
@@ -60,6 +72,13 @@ function app_link_route () {
     if (platform.not_match && UA.match(new RegExp(platform.not_match, 'i'))) {
       continue;
     }
+
+    // Display correct store badge in case the redirect doesn't work
+    var el = document.getElementById(id);
+    if (el) {
+      el.className = "";
+    }
+
     window[platform.js_callback](PLATFORM_DATA[id], FALLBACK_URL);
     return true;
   }

@@ -11,6 +11,8 @@ $plugin = array(
   'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_iphone.js',
   'js_callback' => 'app_link_platform_iphone',
   'form' => 'app_link_platform_iphone_form',
+  'badge_url' => '//linkmaker.itunes.apple.com/images/badges/en-us/badge_appstore-lrg.png',
+  'store_text' => t('Download from App Store'),
 );
 
 /**

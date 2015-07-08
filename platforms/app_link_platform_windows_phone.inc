@@ -3,6 +3,7 @@
  * @file
  * App Link plugin to define Windows Phone App.
  */
+global $language;
 
 $plugin = array(
   'title' => t('Windows Phone App'),
@@ -10,6 +11,8 @@ $plugin = array(
   'js_src' => drupal_get_path('module', 'app_link') . '/platforms/app_link_platform_iphone.js',
   'js_callback' => 'app_link_platform_iphone',
   'form' => 'app_link_platform_windows_phone_form',
+  'badge_url' => '//cmsresources.windowsphone.com/devcenter/en-us/legacy_v1/img/badgegenerator/' . $language->name . '_wphone_cyan_258x67.png',
+  'store_text' => t('Download from Windows Store'),
 );
 
 /**
