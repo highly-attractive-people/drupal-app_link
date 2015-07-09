@@ -3,6 +3,7 @@
  * @file
  * App Link plugin to define Windows Phone App.
  */
+
 global $language;
 
 $plugin = array(
@@ -16,7 +17,7 @@ $plugin = array(
 );
 
 /**
- * Helper function to construct a Drupal form for Windows Phone platform parameters.
+ * Construct a Drupal form for Windows Phone platform parameters.
  *
  * @param array $conf
  *   An array of existing configurations.

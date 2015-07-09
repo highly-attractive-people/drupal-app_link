@@ -12,7 +12,7 @@ $plugin = array(
 );
 
 /**
- * Helper function to construct a Drupal form for the web platform parameters.
+ * Construct a Drupal form for the web platform parameters.
  *
  * @param array $conf
  *   An array of existing configurations.

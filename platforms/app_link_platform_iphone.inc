@@ -16,7 +16,7 @@ $plugin = array(
 );
 
 /**
- * Helper function to construct a Drupal form for iPhone platform parameters.
+ * Construct a Drupal form for iPhone platform parameters.
  *
  * @param array $conf
  *   An array of existing configurations.
