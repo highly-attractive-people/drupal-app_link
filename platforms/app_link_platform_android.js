@@ -18,8 +18,9 @@
  */
 /*global app_link_is_path_whitelisted*/
 function app_link_platform_android(platform, fallback_url) {
-  fallback_url = platform.store_url || fallback_url;
   var app_url = getAppUrl();
+  var store_url = getStoreUrl();
+  fallback_url = store_url || fallback_url;
 
   var intent_url = getIntentUrl();
   var UA = navigator.userAgent;
@@ -124,6 +125,19 @@ function app_link_platform_android(platform, fallback_url) {
     }
 
     return '';
+  }
+
+  /**
+   * Apply configuration details to the app store URL, including
+   * optional query string params.
+   */
+  function getStoreUrl () {
+    var url = platform.store_url;
+    if (url && platform.supports_qs) {
+      // Pass-Through Query-String values.
+      url = app_link_set_qs(url, location.search && location.search.slice(1));
+    }
+    return url;
   }
 
   /**

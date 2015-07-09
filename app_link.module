@@ -301,6 +301,13 @@ function app_link_qs_path_form(array $conf, array &$form) {
     '#type' => 'textarea',
     '#default_value' => isset($conf['path_whitelist']) ? $conf['path_whitelist'] : '',
   );
+
+  $form['supports_store_qs'] = array(
+    '#title' => t("Append the query string to the App's Store URL"),
+    '#description' => t("If checked, the query string will be appended the App's Store URL, example:\n/app_link/myapp?a=b&c=d\https://control.kochava.com/v1/cpi/click?a=b&c=d\nTo  support App download trackers."),
+    '#type' => 'checkbox',
+    '#default_value' => isset($conf['supports_qs']) ? $conf['supports_qs'] : FALSE,
+  );
 }
 
 /**
