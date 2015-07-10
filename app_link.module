@@ -87,8 +87,7 @@ function app_link_theme($existing, $type, $theme, $path) {
   return array(
     'app_link' => array(
       'variables' => array(
-        'platform_info' => '',
-        'platform_data' => '',
+        'platforms' => '',
         'fallback_url' => '',
         'canonical_link' => '',
         'scripts' => array(),
@@ -111,12 +110,8 @@ function app_link_bounce($applink) {
   ctools_include('plugins');
   $platform_info = ctools_get_plugins('app_link', 'platform');
   // Inline JavaScript for performance, we want 0 external requests.
-  $scripts = array();
-  foreach ($platform_info as $platform) {
-    if (!empty($platform['js_src']) && empty($scripts[$platform['js_src']])) {
-      $scripts[$platform['js_src']] = "<script" . ">" . file_get_contents($platform['js_src']) . "</script>";
-    }
-  }
+  $js = file_get_contents(drupal_get_path('module', 'app_link') . '/js/app_link.js');
+  $scripts['route'] = '<script>' . $js . '</script>';
 
   $metatags = array(
     'charset' => '<meta charset="utf-8">',
@@ -138,17 +133,15 @@ function app_link_bounce($applink) {
   );
   drupal_alter('applink_info', $applink);
 
-  // Remove the fallback plugins because those don't do client redirections.
-  // Those only provide data to generate the fallback URL for other platform
-  // plugins.
-  $applink['platform_info'] = array_filter($applink['platform_info'], function ($platform_item_info) {
-    return empty($platform_item_info['fallback']);
-  });
+  // Merge Platform JS info data.
+  $platforms = array();
+  foreach ($applink['platform_info'] as $id => &$platform) {
+    $platforms[$id] = array_merge($applink['platform_info'][$id]['js'], $applink['platform_data'][$id]);
+  }
 
   drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
   print theme('app_link', array(
-    'platform_info' => drupal_json_encode($applink['platform_info']),
-    'platform_data' => drupal_json_encode($applink['platform_data']),
+    'platforms' => drupal_json_encode($platforms),
     'fallback_url' => drupal_json_encode($applink['fallback_url']),
     'canonical_link' => $fallback_url,
     'scripts' => $applink['scripts'],
@@ -460,14 +453,14 @@ function app_link_process_applink($applink) {
 function app_link_get_store_badges($platform_info, $platform_data) {
   $badges = array();
 
-  foreach ($platform_info as $platform => $info) {
-    if (empty($platform_data[$platform]['store_url'])) {
+  foreach ($platform_info as $id => $platform) {
+    if (empty($platform_data[$id]['store_url'])) {
       continue;
     }
 
-    $badges[$key]['store_url'] = $platform_data[$key]['store_url'];
-    $badges[$key]['store_text'] = $platform['store_text'];
-    $badges[$key]['badge_url'] = $platform['badge_url'];
+    $badges[$id]['store_url'] = $platform_data[$id]['store_url'];
+    $badges[$id]['store_text'] = $platform['store_text'];
+    $badges[$id]['badge_url'] = $platform['badge_url'];
   }
 
   return $badges;

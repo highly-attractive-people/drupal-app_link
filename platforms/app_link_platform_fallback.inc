@@ -7,7 +7,7 @@
 $plugin = array(
   'title' => t('Web Fallback'),
   'form' => 'app_link_platform_fallback_form',
-  'fallback' => TRUE,
+  'js' => array(),
   'weight' => -10,
 );
 
