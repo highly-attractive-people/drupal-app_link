@@ -1,0 +1,56 @@
+{
+    "app_link_platform_fallback": {
+        "fallback_url": "https://github.com/robcolburn/drupal-app_link",
+        "supports_qs": 0,
+        "supports_path": 0,
+        "path_whitelist": []
+    },
+    "app_link_platform_android": {
+        "router": "android",
+        "match": "Android",
+        "not_match": "Kindle|Windows Phone",
+        "app_url": "nbctve://",
+        "intent_url": "intent://live#Intent;scheme=nbctve;package=com.nbcuni.nbc;end",
+        "store_url": "https://play.google.com/store/apps/details?id=com.nbcuni.nbc&hl=en",
+        "supports_qs": 0,
+        "supports_path": 0,
+        "path_whitelist": []
+    },
+    "app_link_platform_ipad": {
+        "router": "iphone",
+        "match": "iPad",
+        "app_url": "nbctve://",
+        "store_url": "https://itunes.apple.com/us/app/nbc-watch-live-tv-now-stream/id442839435?mt=8",
+        "supports_qs": 0,
+        "supports_path": 0,
+        "path_whitelist": []
+    },
+    "app_link_platform_iphone": {
+        "router": "iphone",
+        "match": "iPhone|iPod",
+        "not_match": "Windows Phone",
+        "app_url": "nbctve://",
+        "store_url": "https://itunes.apple.com/us/app/nbc-watch-live-tv-now-stream/id442839435?mt=8",
+        "supports_qs": 0,
+        "supports_path": 0,
+        "path_whitelist": []
+    },
+    "app_link_platform_kindle_fire": {
+        "router": "iphone",
+        "match": "Kindle",
+        "app_url": "nbctve://",
+        "store_url": "http://www.amazon.com/NBC-News-Digital-LLC/dp/B0055DL1G4",
+        "supports_qs": 0,
+        "supports_path": 0,
+        "path_whitelist": []
+    },
+    "app_link_platform_windows_phone": {
+        "router": "iphone",
+        "match": "Windows Phone",
+        "app_url": "nbctve://",
+        "store_url": "http://www.windowsphone.com/en-us/store/app/nbc-sports-live-extra/2bfb700d-7703-45ac-818e-677857b3b849",
+        "supports_qs": 0,
+        "supports_path": 0,
+        "path_whitelist": []
+    }
+}

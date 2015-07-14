@@ -1,15 +1,23 @@
-APP LINK - https://www.drupal.org/sandbox/robcolburn/2289011
+APP LINK
 ======================================================
 
-CONTENTS OF THIS FILE
----------------------
+
+https://www.drupal.org/sandbox/robcolburn/2289011
+[![build status](https://img.shields.io/travis/robcolburn/drupal-app_link.svg?style=flat-square)](https://travis-ci.org/robcolburn/drupal-app_link)
+
+github.com/robcolburn/drupal-app_link
+
+Contents of this File
+-----------------------------
  * Introduction
+ * Project Status
  * Requirements
  * Installation
  * Configuration
  * Troubleshooting
 
-INTRODUCTION
+
+Introduction
 -----------------------------
 The App Link module to redirect user's to a native app. Use this module
 to link native apps on end-user user platforms, such as mobile devices.
@@ -21,18 +29,18 @@ This module provides:
  * A CTools export plugin for configuration deployment.
  * A CTools plugin api to extend this module to support more platforms.
 
-REQUIREMENTS
+Requirements
 ------------
 This module requires the following modules:
  * CTools (https://drupal.org/project/ctools)
 
-INSTALLATION
+Installation
 ------------
  * Install as you would normally install a contributed drupal module. See:
    https://drupal.org/documentation/install/modules-themes/modules-7
    for further information.
 
-CONFIGURATION
+Configuration
 -----------------------------
  * Configure user permissions in Administration » People » Permissions:
    - Use the administration pages and help (System module)
@@ -41,35 +49,40 @@ CONFIGURATION
    - The "Administer App Link entries" is required to add/edit App Links
      (by default, administrators have this permission)
  * Create an App Link:
-   For brevity, we'll assume you only have an iOS App… about cats.
+   For brevity, we'll assume you only have an iPhone App… about cats.
    1. Navigate to Configuration » Search and Metadata » App Link
    2. Click the Add button near the top of the page (by page title).
    3. Fill out the Add App Link Form.
-     - Path
-       The path that will link to the app, example:
+     - `Path`:
+       The path that will link to the app. Example:
        mycatapp
        http://mysite.com/app_link/mycatapp
-     - Fallback Web URL
+     - `Fallback Web URL`:
        Where users will go on unsupported platforms (like desktop),
        since we can't direct them to an app.
-     - iOS App URL
-       The URL Scheme to direct the user to the App, example:
+     - `App URL Scheme`:
+       The URL Scheme to direct the user to the App. Example:
        mycatapp://
-     - App Page on the App Store
+     - `App Store URL`:
        The URL to the App Store where the user can download the App.
        https://itunes.apple.com/us/app/game-for-cats/id406740405?mt=8
-     - Append the query string to the App's URL Scheme
-       If checked, the query string will be appended the App's URL Scheme, example:
+     - `Append the query string to the App's URL Scheme`:
+       If checked, the query string will be appended the App's UR:
        http://mysite.com/app_link/mycatapp?a=b&c=d
        mycatapp://?a=b&c=d
-     - Append the "path" param to the App\'s URL Scheme
-       If checked, the query string will be appended the App's URL Scheme, example:
+     - `Append the "path" param to the App's URL Scheme`
+       If checked, the query string will be appended the App's URL Scheme. Example:
        http://mysite.com/app_link/mycatapp?path=cat/video
        mycatapp://cat/video
+     - `Append the query string to the App's Store URL`
+       If checked, the query string will be appended the App's Store URL. To  support App download trackers. Example:
+       http://mysite.com/app_link/myapp?a=b&c=d
+       https://control.kochava.com/v1/cpi/click?a=b&c=d
    4. Hit save, and you'll see your link listed.
    5. Try it out.  Navigate to the desired path:
      http://mysite.com/app_link/mycatapp
 
-TROUBLESHOOTING
+Troubleshooting
+-----------------------------
  * Please report any issues to the Project's Issue Queue
    https://www.drupal.org/project/issues/2289011
