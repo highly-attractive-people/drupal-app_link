@@ -31,7 +31,13 @@ function app_link_platform_android(platform, fallback_url) {
   var timer_iframe;
   var timer_webkit;
   if (UA.match(/Chrome/)) {
-    useIntent(intent_url);
+    // graceful fallback if no intent_url defined
+    if(intent_url)  {
+      useIntent(intent_url);
+    } else {
+	    tryWebkitApproach();
+	    timer_iframe = setTimeout(tryIframeApproach, 1500);    	
+    }  
   } else if (UA.match(/Firefox/)) {
     tryWebkitApproach();
     timer_iframe = setTimeout(tryIframeApproach, 1500);
