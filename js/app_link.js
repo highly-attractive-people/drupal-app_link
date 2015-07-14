@@ -11,6 +11,25 @@
  *   Primary URL that we will attempt to redirect to.
  */
 function app_link (platforms, fallbackUrl) {
+  /**
+   * You may set a before hook to run before
+   *   - It is expected that these hooks will accept a callback parameter.
+   * @example
+   *   app_link.before = function(callback) {
+   *     setTimeout(function() {
+   *       callback();
+   *     }, 1000);
+   *   };
+   */
+  if (app_link.before) {
+    // return app_link.before(function() {
+    //   app_link(platforms, fallbackUrl);
+    // });
+    return app_link.before(function() {
+      app_link.before = null;
+      app_link(platforms, fallbackUrl);
+    });
+  }
   var UA = navigator.userAgent;
   var platform = platforms.app_link_platform_fallback;
   if (platform && platform.supports_qs) {
@@ -49,6 +68,11 @@ function app_link (platforms, fallbackUrl) {
   window.location = fallbackUrl;
   return fallbackUrl;
 }
+
+/**
+ * Callbacks for individual routing logic.
+ */
+app_link.routers = {};
 
 /**
  * Transform a given URL URL.
@@ -197,11 +221,6 @@ function applyUrl (url, parts) {
   }
   return parser.href;
 }
-
-/**
- * Callbacks for individual routing logic.
- */
-app_link.routers = {};
 
 /**
  * Directs an iPhone-like device to the Mobile App or Store.
