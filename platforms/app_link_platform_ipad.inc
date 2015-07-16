@@ -6,52 +6,8 @@
 
 $plugin = array(
   'title' => t('iPad App'),
-  'js' => array(
-    'router' => 'iphone',
-    'match' => 'iPad',
-  ),
-  'form' => 'app_link_platform_ipad_form',
   'badge_url' => '//linkmaker.itunes.apple.com/images/badges/en-us/badge_appstore-lrg.png',
   'store_text' => t('Download from App Store'),
+  'store_title' => t('App Store'),
+  'store_pattern' => 'itms://itunes.apple.com/us/app/',
 );
-
-/**
- * Helper function to construct a Drupal form for iPad platform parameters.
- *
- * @param array $conf
- *   An array of existing configurations.
- *
- * @return array
- *   A Drupal form structure.
- */
-function app_link_platform_ipad_form(array $conf = array()) {
-  $form = array(
-    '#type' => 'fieldset',
-    '#title' => t('iPad App'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-    '#tree' => TRUE,
-  );
-  $form['app_url'] = array(
-    '#title' => t('App URL Scheme'),
-    '#description' => t('URL Scheme of the iPad App to redirect to'),
-    '#attributes' => array('placeholder' => 'myapp://'),
-    '#type' => 'textfield',
-    '#element_validate' => array('app_link_valid_url_scheme'),
-    '#maxlength' => 2000,
-    '#required' => FALSE,
-    '#default_value' => isset($conf['app_url']) ? $conf['app_url'] : '',
-  );
-  $form['store_url'] = array(
-    '#title' => t('App Store Url'),
-    '#description' => t('URL to where the iPad App lives in the App Store'),
-    '#attributes' => array('placeholder' => 'itms://itunes.apple.com/us/app/'),
-    '#type' => 'textfield',
-    '#element_validate' => array('app_link_valid_url'),
-    '#maxlength' => 2000,
-    '#required' => FALSE,
-    '#default_value' => isset($conf['store_url']) ? $conf['store_url'] : '',
-  );
-  app_link_qs_path_form($conf, $form);
-  return $form;
-}

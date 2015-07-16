@@ -8,52 +8,8 @@ global $language;
 
 $plugin = array(
   'title' => t('Windows Phone App'),
-  'js' => array(
-    'router' => 'iphone',
-    'match' => 'Windows Phone',
-  ),
-  'form' => 'app_link_platform_windows_phone_form',
   'badge_url' => '//cmsresources.windowsphone.com/devcenter/en-us/legacy_v1/img/badgegenerator/' . $language->name . '_wphone_cyan_258x67.png',
   'store_text' => t('Download from Windows Store'),
+  'store_title' => t('Windows Phone Store'),
+  'store_pattern' => 'https://www.windowsphone.com/en-us/store/app/<product-code>/<product-id>',
 );
-
-/**
- * Construct a Drupal form for Windows Phone platform parameters.
- *
- * @param array $conf
- *   An array of existing configurations.
- *
- * @return array
- *   A Drupal form structure.
- */
-function app_link_platform_windows_phone_form(array $conf = array()) {
-  $form = array(
-    '#type' => 'fieldset',
-    '#title' => t('Windows Phone App'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-    '#tree' => TRUE,
-  );
-  $form['app_url'] = array(
-    '#title' => t('App URL Scheme'),
-    '#description' => t('URL Scheme of the Windows Phone App to redirect to'),
-    '#attributes' => array('placeholder' => 'myapp://'),
-    '#type' => 'textfield',
-    '#element_validate' => array('app_link_valid_url_scheme'),
-    '#maxlength' => 2000,
-    '#required' => FALSE,
-    '#default_value' => isset($conf['app_url']) ? $conf['app_url'] : '',
-  );
-  $form['store_url'] = array(
-    '#title' => t('App Page on the Windows Phone Store'),
-    '#description' => t('The URL where you can download the App in the Windows Phone Store'),
-    '#attributes' => array('placeholder' => 'http://www.windowsphone.com/en-us/store/app/<product-code>/<product-id>'),
-    '#type' => 'textfield',
-    '#element_validate' => array('app_link_valid_url'),
-    '#maxlength' => 2000,
-    '#required' => FALSE,
-    '#default_value' => isset($conf['store_url']) ? $conf['store_url'] : '',
-  );
-  app_link_qs_path_form($conf, $form);
-  return $form;
-}

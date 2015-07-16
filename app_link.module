@@ -135,8 +135,8 @@ function app_link_bounce($applink) {
 
   // Merge Platform JS info data.
   $platforms = array();
-  foreach ($applink['platform_info'] as $id => &$platform) {
-    $platforms[$id] = array_merge($applink['platform_info'][$id]['js'], $applink['platform_data'][$id]);
+  foreach ($applink['platform_info'] as $id => $platform) {
+    $platforms[$id] = $applink['platform_data'][$id];
   }
 
   drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
@@ -178,13 +178,60 @@ function app_link_ctools_export_ui_form(&$form, &$form_state) {
   $platforms = ctools_get_plugins('app_link', 'platform');
   uasort($platforms, 'ctools_plugin_sort');
   foreach ($platforms as $id => $platform) {
-    if ($platform['form']) {
-      $form_callback = $platform['form'];
-      $platform_data = isset($applink->platform_data[$id]) ? $applink->platform_data[$id] : array();
-      $form['platform_data'][$id] = $form_callback($platform_data);
-    }
+    $form_callback = !empty($platform['form']) ? $platform['form'] : 'app_link_platform_form';
+    $platform_data = !empty($applink->platform_data[$id]) ? $applink->platform_data[$id] : array();
+    $form['platform_data'][$id] = $form_callback($platform, $platform_data);
   }
 
+  return $form;
+}
+
+/**
+ * Construct a Drupal form for the platform parameters.
+ *
+ * @param array $platform
+ *   An array of information about plaform.
+ * @param array $conf
+ *   An array of existing configurations.
+ *
+ * @return array
+ *   A Drupal form structure.
+ */
+function app_link_platform_form($platform, array $conf = array()) {
+  $form = array(
+    '#type' => 'fieldset',
+    '#title' => $platform['title'],
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE,
+  );
+  $form['app_url'] = array(
+    '#title' => t('App URL Scheme'),
+    '#description' => t('URL Scheme of the @title to redirect to', array(
+      '@title' => $platform['title'],
+    )),
+    '#attributes' => array('placeholder' => 'myapp://'),
+    '#type' => 'textfield',
+    '#element_validate' => array('app_link_valid_url_scheme'),
+    '#maxlength' => 2000,
+    '#required' => FALSE,
+    '#default_value' => isset($conf['app_url']) ? $conf['app_url'] : '',
+  );
+  $form['store_url'] = array(
+    '#title' => t('Store Page on @store_title', array(
+      '@store_title' => $platform['store_title'],
+    )),
+    '#description' => t('URL where you can download the App.', array(
+      '@store_title' => $platform['store_title'],
+    )),
+    '#attributes' => array('placeholder' => $platform['store_pattern']),
+    '#type' => 'textfield',
+    '#element_validate' => array('app_link_valid_url'),
+    '#maxlength' => 2000,
+    '#required' => FALSE,
+    '#default_value' => isset($conf['store_url']) ? $conf['store_url'] : '',
+  );
+  app_link_qs_path_form($conf, $form);
   return $form;
 }
 
@@ -217,6 +264,17 @@ function app_link_valid_id($element, &$form_state) {
 function app_link_valid_url_scheme($element, &$form_state) {
   if (!empty($element['#value']) && !preg_match('#^[a-z][a-z0-9\+\.\-]+://#', $element['#value'])) {
     form_error($element, t('The @field is an invalid URL Scheme', array(
+      '@field' => $element['#title'],
+    )));
+  }
+}
+
+/**
+ * Ensures that, if a value is entered, it is a valid Intent URL.
+ */
+function app_link_valid_intent($element, &$form_state) {
+  if (!empty($element['#value']) && !preg_match('#^intent://#', $element['#value'])) {
+    form_error($element, t('The @field is an invalid Android Intent URL', array(
       '@field' => $element['#title'],
     )));
   }

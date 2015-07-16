@@ -7,23 +7,24 @@
 $plugin = array(
   'title' => t('Web Fallback'),
   'form' => 'app_link_platform_fallback_form',
-  'js' => array(),
   'weight' => -10,
 );
 
 /**
- * Construct a Drupal form for the web platform parameters.
+ * Construct a Drupal form for the platform parameters.
  *
+ * @param array $platform
+ *   An array of information about plaform.
  * @param array $conf
  *   An array of existing configurations.
  *
  * @return array
  *   A Drupal form structure.
  */
-function app_link_platform_fallback_form(array $conf = array()) {
+function app_link_platform_fallback_form(array $platform, array $conf = array()) {
   $form = array(
     '#type' => 'fieldset',
-    '#title' => t('Web Fallback'),
+    '#title' => $platform['title'],
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
     '#tree' => TRUE,
