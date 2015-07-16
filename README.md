@@ -1,11 +1,8 @@
 APP LINK
 ======================================================
-
-
-https://www.drupal.org/sandbox/robcolburn/2289011
-[![build status](https://img.shields.io/travis/robcolburn/drupal-app_link.svg?style=flat-square)](https://travis-ci.org/robcolburn/drupal-app_link)
-
-github.com/robcolburn/drupal-app_link
+* [Drupal.org App Link Project](https://www.drupal.org/project/app_link)
+* [GitHub App Link Repo](https://github.com/robcolburn/drupal-app_link)
+* [![build status](https://img.shields.io/travis/robcolburn/drupal-app_link.svg?style=flat-square)](https://travis-ci.org/robcolburn/drupal-app_link)
 
 Contents of this File
 -----------------------------

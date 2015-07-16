@@ -7,13 +7,16 @@
     "test": "test"
   },
   "devDependencies": {
+    "eslint": "^1.0.0-rc-1",
     "express": "^4.13.1",
+    "ghooks": "^0.3.2",
     "lodash": "^3.10.0",
     "mocha": "^2.2.5",
     "phantom": "^0.7.2"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "lint": "eslint js/* test/*"
   },
   "repository": {
     "type": "git",
@@ -30,5 +33,11 @@
   "bugs": {
     "url": "https://github.com/robcolburn/drupal-app_link/issues"
   },
-  "homepage": "https://github.com/robcolburn/drupal-app_link#readme"
+  "homepage": "https://github.com/robcolburn/drupal-app_link#readme",
+  "config": {
+    "ghooks": {
+      "pre-commit": "npm run lint",
+      "pre-push": "npm test"
+    }
+  }
 }
