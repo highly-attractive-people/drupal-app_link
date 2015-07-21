@@ -50,6 +50,8 @@ describe("Test Applink Redirects", function() {
    *     URL to start the browser at.
    *   - {object} headers
    *     Custom HTTP headers to set in browser (such as Referer - intentional typo)
+   *   - {boolean} loadImages
+   *     TRUE to load images when rendering pages (slower).
    *   - {string} inject
    *     Custom HTML to inject in page.
    * @param {string} targetURL
@@ -85,6 +87,13 @@ describe("Test Applink Redirects", function() {
       var evaluate = new Promise(function (resolve) {
         page.set("settings.userAgent", useragent, resolve);
       });
+      if (!options.loadImages) {
+        evaluate = evaluate.then(function() {
+          return new Promise(function (resolve) {
+            page.set("settings.loadImages", false, resolve);
+          });
+        });
+      }
       if (options.headers) {
         evaluate = evaluate.then(function() {
           return new Promise(function (resolve) {
