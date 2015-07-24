@@ -21,7 +21,7 @@ var USERAGENTS = {
   "Kindle Fire": "Mozilla/5.0 (Linux; U; Android 2.3.4; en-us; Kindle Fire Build/GINGERBREAD) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
 };
 
-describe("Test Applink Redirects", function() {
+describe("App Link Redirects", function() {
   // This spawns a separate PhantomJS process that will talk back asyncronously via WebSocket.
   var phantom_instance;
   before(function(done) {
@@ -44,14 +44,16 @@ describe("Test Applink Redirects", function() {
    * Test a given app link
    *   - We will take the useragent and lie to Phantom.
    * @param {object} options
-   *   - {string} useragent
-   *     User Agent that Phantom should prentend to be.
+   *   - {string} browser
+   *     User Agent key that Phantom should pretend to be.
    *   - {string} baseURL
    *     URL to start the browser at.
    *   - {object} headers
    *     Custom HTTP headers to set in browser (such as Referer - intentional typo)
    *   - {boolean} loadImages
    *     TRUE to load images when rendering pages (slower).
+   *   - {int} timeLimit
+   *     Time in milliseconds to wait for Navigation change.
    *   - {string} inject
    *     Custom HTML to inject in page.
    * @param {string} targetURL
@@ -60,8 +62,9 @@ describe("Test Applink Redirects", function() {
    *   Callback to call when done, called with Error if failure.
    */
   function testApplinkRedirect (options, targetURL, done) {
-    var useragent = options.useragent || USERAGENTS.Unsupported;
+    var useragent = USERAGENTS[options.browser || "Unsupported"];
     var baseURL = options.baseURL || BASE_URL;
+    var timeLimit = options.timeLimit || 150;
     phantom_instance.createPage(function (page) {
       // The "onNavigationRequested" event is async and can easily fire in an
       // unexpected order.  So, we wrap the two tasks in separate promises.
@@ -76,13 +79,12 @@ describe("Test Applink Redirects", function() {
           }
           resolve(url);
         });
-        var timelimit = 300;
         // If something bad happens, and we do not get our expected navigation,
         // then we would like to catch that rather than wait for Mocha to bail out.
         // This allows us to properly kill the spawned process.
         setTimeout(function() {
-          reject(new Error("onNavigationRequested waiting too long after " + timelimit + "ms."));
-        }, timelimit);
+          reject(new Error("onNavigationRequested waiting too long after " + timeLimit + "ms."));
+        }, timeLimit);
       });
       var evaluate = new Promise(function (resolve) {
         page.set("settings.userAgent", useragent, resolve);
@@ -106,17 +108,20 @@ describe("Test Applink Redirects", function() {
           page.open(baseURL, resolve);
         });
       });
+      if (options.inject) {
+        evaluate = evaluate.then(function() {
+          return new Promise(function (resolve) {
+            page.evaluate(options.inject, resolve); // eslint-disable-line no-eval
+          });
+        });
+      }
       evaluate = evaluate.then(function() {
         return new Promise(function (resolve, reject) {
           // The browserCall function is copied and run in the PhantomJS browser syncronously.
-          var browserCall = function(evalCode) {
+          var browserCall = function() {
             // Phantom-Node will not catch thrown errors for us.
             try {
-              if (evalCode) {
-                eval(evalCode); // eslint-disable-line no-eval
-              }
-              var args = Array.prototype.slice.call(arguments, 1);
-              return app_link.apply(this, args);
+              return app_link.apply(this, arguments);
             }
             catch (err) {
               location.href = "";
@@ -136,7 +141,7 @@ describe("Test Applink Redirects", function() {
           };
           page.evaluate(browserCall, nodeReceive,
             // Arguments for browser call
-            options.inject, applink, applink.app_link_platform_fallback.fallback_url
+            applink, applink.app_link_platform_fallback.fallback_url
           );
         });
       });
@@ -152,131 +157,128 @@ describe("Test Applink Redirects", function() {
     });
   }
 
-  describe("Platform", function() {
-    it("Unsupported Desktop to the Fallback.", function(done) {
-      testApplinkRedirect({}, applink.app_link_platform_fallback.fallback_url, done);
+  it("Unsupported Desktop to the Fallback.", function(done) {
+    testApplinkRedirect({}, applink.app_link_platform_fallback.fallback_url, done);
+  });
+
+  /**
+   * Base line testing for all of our platforms
+   */
+  function testPlatform (browser, platformKey) {
+    var urlType = browser === "Android Chrome" ? "intent_url" : "app_url";
+    describe("Platform " + browser, function() {
+      it("To App URL.", function(done) {
+        testApplinkRedirect({browser: browser}, applink[platformKey][urlType], done);
+      });
+      it("To Store URL w/o App URL.", function(done) {
+        applink[platformKey][urlType] = "";
+        testApplinkRedirect({browser: browser}, applink[platformKey].store_url, done);
+      });
     });
-    function testPlatform (browser, key) {
-      key = "app_link_platform_" + key;
-      it(browser + " to the App Url.", function(done) {
-        var target = browser === "Android Chrome" ? "intent_url" : "app_url";
-        testApplinkRedirect({useragent: USERAGENTS[browser]}, applink[key][target], done);
-      });
-      it(browser + " to the App Store Url w/o app_url.", function(done) {
-        applink[key].app_url = applink[key].intent_url = "";
-        testApplinkRedirect({useragent: USERAGENTS[browser]}, applink[key].store_url, done);
-      });
-      it(browser + " should go to the App Store Url w/o app_url or store_url.", function(done) {
-        applink[key].app_url = applink[key].intent_url = applink[key].store_url = "";
-        testApplinkRedirect({useragent: USERAGENTS[browser]}, applink.app_link_platform_fallback.fallback_url, done);
-      });
-    }
-    testPlatform("iPhone", "iphone");
-    testPlatform("iPod", "iphone");
-    testPlatform("iPad", "ipad");
-    testPlatform("Android Browser", "android");
-    testPlatform("Android Chrome", "android");
-    testPlatform("Windows Phone", "windows_phone");
-    testPlatform("Kindle Fire", "kindle_fire");
-   });
+  }
+  testPlatform("iPhone", "app_link_platform_iphone");
+  testPlatform("iPod", "app_link_platform_iphone");
+  testPlatform("iPad", "app_link_platform_ipad");
+  testPlatform("Android Browser", "app_link_platform_android");
+  testPlatform("Android Chrome", "app_link_platform_android");
+  testPlatform("Windows Phone", "app_link_platform_windows_phone");
+  testPlatform("Kindle Fire", "app_link_platform_kindle_fire");
  
   /**
    * Limit scope to distinct cases: URI Schemes (most) & Intent URLs (Android)
    */
-  describe("URL Processing on URI Schemes", function() {
-    function testPlatform (browser, key, type) {
-      key = "app_link_platform_" + key;
-      it(type + " should pass the querystring if supported.", function(done) {
-        applink[key].supports_qs = 1;
-        var target = applink[key][type].split("#");
-        target = target[0] +
-          (target[0].match(/\?/) ? "&" : "?") + "a=b&c=d" +
-          (target.length > 1 ? "#" + target[1] : "");
-        testApplinkRedirect({useragent: USERAGENTS[browser], baseURL: BASE_URL + "?a=b&c=d"},
-          target, done);
+  function testProcessing (browser, platformKey) {
+    var urlType = browser === "Android Chrome" ? "intent_url" : "app_url";
+    describe("Processing " + urlType, function() {
+      it("Fallbacks back w/o App URL or Store URL.", function(done) {
+        applink[platformKey][urlType] = applink[platformKey].store_url = "";
+        testApplinkRedirect({browser: browser}, applink.app_link_platform_fallback.fallback_url, done);
       });
-      it(type + " should not pass the querystring if not supported.", function(done) {
-        applink[key].supports_qs = 0;
-        var target = applink[key][type];
-        testApplinkRedirect({useragent: USERAGENTS[browser], baseURL: BASE_URL + "?a=b&c=d"},
-          target, done);
+      it("With the querystring, if supported.", function(done) {
+        applink[platformKey].supports_qs = 1;
+        var targetURL = applink[platformKey][urlType].split("#");
+        targetURL = targetURL[0] +
+          (targetURL[0].match(/\?/) ? "&" : "?") + "a=b&c=d" +
+          (targetURL.length > 1 ? "#" + targetURL[1] : "");
+        testApplinkRedirect({browser: browser, baseURL: BASE_URL + "?a=b&c=d"},
+          targetURL, done);
       });
-      it(type + " should pass the path if supported.", function(done) {
-        applink[key].supports_path = 1;
-        var target = applink[key][type].split("#");
-        target = target[0] +
-          (target[0][target[0].length - 1] === "/" ? "" : "/") + "a/b/" +
-          (target.length > 1 ? "#" + target[1] : "");
-        testApplinkRedirect({useragent: USERAGENTS[browser], baseURL: BASE_URL + "?path=/a/b/"},
-          target, done);
+      it("Without the querystring, if not supported.", function(done) {
+        applink[platformKey].supports_qs = 0;
+        var targetURL = applink[platformKey][urlType];
+        testApplinkRedirect({browser: browser, baseURL: BASE_URL + "?a=b&c=d"},
+          targetURL, done);
       });
-      it(type + " should not pass the path if not supported.", function(done) {
-        applink[key].supports_path = 0;
-        var target = applink[key][type];
-        testApplinkRedirect({useragent: USERAGENTS[browser], baseURL: BASE_URL + "?path=/a/b/"},
-          target, done);
+      it("With the path, if supported.", function(done) {
+        applink[platformKey].supports_path = 1;
+        var targetURL = applink[platformKey][urlType].split("#");
+        targetURL = targetURL[0] +
+          (targetURL[0][targetURL[0].length - 1] === "/" ? "" : "/") + "a/b/" +
+          (targetURL.length > 1 ? "#" + targetURL[1] : "");
+        testApplinkRedirect({browser: browser, baseURL: BASE_URL + "?path=/a/b/"},
+          targetURL, done);
       });
-      it(type + " should pass the querystring to Store if supported.", function(done) {
-        applink[key][type] = "";
-        applink[key].supports_store_qs = 1;
-        var base = BASE_URL +
+      it("Without the path, if not supported.", function(done) {
+        applink[platformKey].supports_path = 0;
+        var targetURL = applink[platformKey][urlType];
+        testApplinkRedirect({browser: browser, baseURL: BASE_URL + "?path=/a/b/"},
+          targetURL, done);
+      });
+      it("With the querystring to Store, if supported.", function(done) {
+        applink[platformKey][urlType] = "";
+        applink[platformKey].supports_store_qs = 1;
+        var baseURL = BASE_URL +
           (BASE_URL.match(/\?/) ? "&" : "?") + "a=b&c=d";
-        var target = applink[key].store_url +
-          (applink[key].store_url.match(/\?/) ? "&" : "?") + "a=b&c=d";
-        testApplinkRedirect({useragent: USERAGENTS[browser], baseURL: base},
-          target, done);
+        var targetURL = applink[platformKey].store_url +
+          (applink[platformKey].store_url.match(/\?/) ? "&" : "?") + "a=b&c=d";
+        testApplinkRedirect({browser: browser, baseURL: baseURL},
+          targetURL, done);
       });
-      it(type + " should not pass the querystring to Store if not supported.", function(done) {
-        applink[key][type] = "";
-        applink[key].supports_store_qs = 0;
-        var target = applink[key].store_url;
-        testApplinkRedirect({useragent: USERAGENTS[browser], baseURL: BASE_URL + "?a=b&c=d"},
-          target, done);
+      it("With the querystring to Store, if not supported.", function(done) {
+        applink[platformKey][urlType] = "";
+        applink[platformKey].supports_store_qs = 0;
+        var targetURL = applink[platformKey].store_url;
+        testApplinkRedirect({browser: browser, baseURL: BASE_URL + "?a=b&c=d"},
+          targetURL, done);
       });
-    }
-    testPlatform("iPhone", "iphone", "app_url");
-    testPlatform("Android Chrome", "android", "intent_url");
-    // TODO: Fallback is processed is server-side logic.  Not currently Testable client-side.
-    // This is tough to port since we need it in HTML places like <link rel=canonical />
-    // it("Fallback should pass the querystring if supported.", function(done) {
-    //   applink.fallback.supports_qs = 1;
-    //   testApplinkRedirect(applink, {baseURL: BASE_URL + "?a=b&c=d"},
-    //     applink.fallback.fallback_url + "?a=b&c=d",
-    //     done
-    //   );
-    // });
-  });
+    });
+  }
+  testProcessing("iPhone", "app_link_platform_iphone");
+  testProcessing("Android Chrome", "app_link_platform_android");
+  // TODO: Fallback is processed is server-side logic.  Not currently Testable client-side.
+  // This is tough to port since we need it in HTML places like <link rel=canonical />
+  // it("Fallback should pass the querystring if supported.", function(done) {
+  //   applink.app_link_platform_fallback.supports_qs = 1;
+  //   testApplinkRedirect(applink, {baseURL: BASE_URL + "?a=b&c=d"},
+  //     applink.app_link_platform_fallback.fallback_url + "?a=b&c=d",
+  //     done
+  //   );
+  // });
 
   /**
    * Test Async Before Hook.
    */
-  describe("Asyncronous Before Hook", function() {
-    it("Should run sync before hook.", function(done) {
-      testApplinkRedirect(
-        {inject: "app_link.before = function(cb){ cb(); }"},
-        applink.app_link_platform_fallback.fallback_url,
-        done
-      );
+  describe("Before Hook", function() {
+    it("Should run sync.", function(done) {
+      testApplinkRedirect({inject: function() {
+        app_link.before = function(cb){ cb(); };
+      }}, applink.app_link_platform_fallback.fallback_url, done);
     });
-    it("Should wait for async before hook.", function(done) {
-      testApplinkRedirect(
-        {inject: "app_link.before = function(cb){ setTimeout(cb, 100); }"},
-        applink.app_link_platform_fallback.fallback_url,
-        done
-      );
+    it("Should wait for async.", function(done) {
+      testApplinkRedirect({inject: function() {
+        app_link.before = function(cb){ setTimeout(cb, 33); };
+      }}, applink.app_link_platform_fallback.fallback_url, done);
     });
-    it("Should wait indefinitely for broken async before hook.", function(done) {
-      testApplinkRedirect(
-        {inject: "app_link.before = function(cb){ }"},
-        applink.app_link_platform_fallback.fallback_url,
-        function (err) {
-          if (err) {
-            done();
-          } else {
-            done(new Error("App Link did not wait for before hook."));
-          }
+    it("Should wait indefinitely for broken async.", function(done) {
+      testApplinkRedirect({inject: function() {
+        app_link.before = function(){ };
+      }}, applink.app_link_platform_fallback.fallback_url, function (err) {
+        if (err) {
+          done();
+        } else {
+          done(new Error("App Link did not wait for before hook."));
         }
-      );
+      });
     });
   });
 });
