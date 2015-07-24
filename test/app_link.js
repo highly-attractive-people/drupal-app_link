@@ -18,7 +18,13 @@ var USERAGENTS = {
   "Android Browser": "Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
   "Android Chrome": "Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19",
   "Windows Phone": "Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; NOKIA; Lumia 920)",
-  "Kindle Fire": "Mozilla/5.0 (Linux; U; Android 2.3.4; en-us; Kindle Fire Build/GINGERBREAD) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+  "Kindle Fire": "Mozilla/5.0 (Linux; U; Android 2.3.4; en-us; Kindle Fire Build/GINGERBREAD) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
+  "OSX Safari": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.7.12 (KHTML, like Gecko) Version/7.1.7 Safari/537.85.16",
+  "OSX Chrome": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36",
+  "OSX Firefox": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:38.0) Gecko/20100101 Firefox/38.0",
+  "Windows Explorer": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)",
+  "Windows Chrome": "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36",
+  "Windows Firefox": "Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:27.0) Gecko/20121011 Firefox/27.0"
 };
 
 describe("App Link Redirects", function() {
@@ -183,6 +189,12 @@ describe("App Link Redirects", function() {
   testPlatform("Android Chrome", "app_link_platform_android");
   testPlatform("Windows Phone", "app_link_platform_windows_phone");
   testPlatform("Kindle Fire", "app_link_platform_kindle_fire");
+  testPlatform("OSX Safari", "app_link_platform_mac");
+  testPlatform("OSX Chrome", "app_link_platform_mac");
+  testPlatform("OSX Firefox", "app_link_platform_mac");
+  testPlatform("Windows Explorer", "app_link_platform_windows");
+  testPlatform("Windows Chrome", "app_link_platform_windows");
+  testPlatform("Windows Firefox", "app_link_platform_windows");
  
   /**
    * Limit scope to distinct cases: URI Schemes (most) & Intent URLs (Android)

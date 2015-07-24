@@ -1,9 +1,29 @@
 /**
- * Determine platform based on userAgent, and call it's router.
- * If we don't have a router, bail to fallback.
+ * Determine platform based on userAgent, and redirect with it's respective data.
  *
- * @param {object} platforms
+ * You may set a before hook to run before
+ *   - It is expected that these hooks will accept a callback parameter.
+ * @example
+ *   app_link.before = function(callback) {
+ *     setTimeout(function() {
+ *       callback();
+ *     }, 1000);
+ *   };
+ *
+ * @param {object:<platformKey:plaform>} platforms
  *   Data about the App Link per platform.
+ *   - {string} platform.app_url
+ *     URL Scheme to the app.
+ *   - {string} platform.intent_url
+ *     Intent URL to the app.
+ *   - {string} platform.store_url
+ *     URL to find this app in the app store.
+ *   - {boolean} platform.supports_qs
+ *     True if the App URL supports appending a query-string
+ *   - {boolean} platform.supports_path
+ *     True if the App URL supports appending a path
+ *   - {array} platform.path_whitelist
+ *     RegExp strings to filter the query-string path by.
  * @param {string} fallbackUrl
  *   The URL to route to if we cannot route another way.
  *
@@ -11,68 +31,75 @@
  *   Primary URL that we will attempt to redirect to.
  */
 function app_link (platforms, fallbackUrl) {
-  /**
-   * You may set a before hook to run before
-   *   - It is expected that these hooks will accept a callback parameter.
-   * @example
-   *   app_link.before = function(callback) {
-   *     setTimeout(function() {
-   *       callback();
-   *     }, 1000);
-   *   };
-   */
+  // Exexcute any before hooks.
   if (app_link.before) {
-    // return app_link.before(function() {
-    //   app_link(platforms, fallbackUrl);
-    // });
     return app_link.before(function() {
       app_link.before = null;
       app_link(platforms, fallbackUrl);
     });
   }
-  var UA = navigator.userAgent;
+  // Add referrer to fallback (Server is unable to do this accurately).
   var platform = platforms.app_link_platform_fallback;
   if (platform && platform.supports_qs) {
-    fallbackUrl = applyReferrer(fallbackUrl);
+    fallbackUrl = app_link.applyReferrer(app_link.fallbackUrl);
   }
-  for (var id in platforms) {
-    platform = platforms[id];
-    // Platforms should have at least a match rule.
-    if (!platform.match) {
-      continue;
-    }
-    // Validate if UA matches the platform's "match" expression.
-    if (platform.match && !UA.match(new RegExp(platform.match, "i"))) {
-      continue;
-    }
-    // Validate if UA does not matches the platform's "match" expression.
-    if (platform.not_match && UA.match(new RegExp(platform.not_match, "i"))) {
-      continue;
-    }
-
-    // Display correct store badge in case the redirect doesn't work
-    var el = document.getElementById(id);
-    if (el) {
-      el.className = "";
-    }
-
-    if (!platform.router) {
-      throw new TypeError("Platform '" + id + "': Cannot read property 'router'. Platform:\n" + JSON.stringify(platform));
-    }
-    if (!app_link.routers[platform.router]) {
-      throw new TypeError("Platform '" + id + "': Router " + JSON.stringify(platform.router) + " does not exist.");
-    }
-
-    return app_link.routers[platform.router](platforms[id], fallbackUrl);
+  // Determine the user's platform.
+  var platformKey = app_link.getPlatformKey(navigator.userAgent) || app_link.getPlatformKey(navigator.appVersion);
+  platform = platforms[platformKey];
+  // Display correct store badge in case the redirect fails or user returns to page.
+  var el = platformKey && document.getElementById(platformKey);
+  if (el) {
+    el.className = "";
   }
-  window.location = fallbackUrl;
-  return fallbackUrl;
+  // If we don't recognize the platform, or have data about the platform -- fallback.
+  app_link.fallbackUrl = fallbackUrl;
+  if (!platform) {
+    return app_link.fallback();
+  }
+  // Transform App Urls according to rules.
+  var appUrl = app_link.transformUrl(platform.app_url, platform.supports_qs, platform.supports_path, platform.path_whitelist);
+  var intentUrl = app_link.transformUrl(platform.intent_url, platform.supports_qs, platform.supports_path, platform.path_whitelist);
+  // We have a platform, update fallback to be the store.
+  app_link.fallbackUrl = app_link.transformUrl(platform.store_url, platform.supports_store_qs) || fallbackUrl;
+
+  var UA = navigator.userAgent;
+
+  // Newer Droids must use Intents
+  if (UA.match(/Android/) && UA.match(/Chrome/) && !UA.match(/Kindle|Windows/)) {
+    return app_link.direct(intentUrl);
+  }
+  // Most webkits are cool with timeout.
+  else if (UA.match(/Android/) && UA.match(/Firefox/)) {
+    return app_link.direct(appUrl);
+  }
+  // Newer iOS & most Android: Don't like direct location, and like the hidden iframe trick.
+  else {
+    return app_link.iframe(appUrl);
+  }
 }
 
 /**
- * Callbacks for individual routing logic.
+ * Detecting user's platform (their device / operating-system).
+ *
+ * @param {string} UA
+ *   Browser userAgent or appVersion (Sometimes we need the version info).
+ *
+ * @return {string}
+ *   A key to App Link platforms data that matches user's platform.
  */
-app_link.routers = {};
+app_link.getPlatformKey = function (UA) {
+  var version;
+  return (
+    (UA.match(/Android/i) && !UA.match(/Kindle|Windows/i)) ? 'app_link_platform_android' :
+    UA.match(/iPhone|iPod/i) ? 'app_link_platform_iphone' :
+    UA.match(/iPad/i) ? 'app_link_platform_ipad' :
+    UA.match(/Windows Phone/i) ? 'app_link_platform_windows_phone' :
+    UA.match(/Kindle/i) ? 'app_link_platform_kindle_fire' :
+    ((version = UA.match(/Windows NT (\d+?.\d+?)/i)) && version[1] - 0 >= 6.2) ? 'app_link_platform_windows' :
+    ((version = UA.match(/OS X (\d+?[._]\d+?)/i)) && (version[1] = version[1].replace('_', '.')) && version[1] - 0 >= 10.6) ? 'app_link_platform_mac' :
+    ''
+  );
+};
 
 /**
  * Transform a given URL URL.
@@ -91,21 +118,21 @@ app_link.routers = {};
  * @return {string}
  *   The transformed URL.
  */
-function transformUrl (url, applyQs, applyPath, pathWhitelist) {
+app_link.transformUrl = function (url, applyQs, applyPath, pathWhitelist) {
   if (url && applyPath) {
-    var path = getQueryParams().path;
-    if (isPathWhitelisted(path, pathWhitelist)) {
-      url = applyUrl(url, {pathname: path});
+    var path = app_link.getQueryParams().path;
+    if (app_link.isPathWhitelisted(path, pathWhitelist)) {
+      url = app_link.applyUrl(url, {pathname: path});
     }
   }
   if (url && applyQs) {
     // Pass-Through Query-String values.
-    url = applyUrl(url, {search: location.search});
+    url = app_link.applyUrl(url, {search: location.search});
     // Attempt to set a referrer.
-    url = applyReferrer(url);
+    url = app_link.applyReferrer(url);
   }
   return url;
-}
+};
 
 /**
  * Validate that path matches at least one regular expression in a whitelist.
@@ -118,7 +145,7 @@ function transformUrl (url, applyQs, applyPath, pathWhitelist) {
  * @return {boolean}
  *   True if a match is found or if whitelist is empty. False otherwise.
  */
-function isPathWhitelisted(path, whitelist) {
+app_link.isPathWhitelisted = function (path, whitelist) {
   // We must have something to work with.
   if (!path) {
     return false;
@@ -139,7 +166,7 @@ function isPathWhitelisted(path, whitelist) {
   }
 
   return false;
-}
+};
 
 /**
  * Parse Query String parameters.
@@ -147,7 +174,7 @@ function isPathWhitelisted(path, whitelist) {
  * @return {object<key:value>}
  *   A map of key values from the query string.
  */
-function getQueryParams () {
+app_link.getQueryParams = function () {
   var query = {};
   (location.search || "")
     // Remove the "?"
@@ -160,7 +187,7 @@ function getQueryParams () {
       query[decodeURIComponent(k)] = decodeURIComponent(v);
     });
   return query;
-}
+};
 
 /**
  * Attaches the referrer to a destination URL.
@@ -171,12 +198,12 @@ function getQueryParams () {
  * @return {string}
  *   The transformed URL.
  */
-function applyReferrer(url) {
+app_link.applyReferrer = function (url) {
   if (url && document.referrer && url.indexOf("referrer") === -1) {
-    return applyUrl(url, {search: "referrer=" + encodeURIComponent(document.referrer)});
+    return app_link.applyUrl(url, {search: "referrer=" + encodeURIComponent(document.referrer)});
   }
   return url;
-}
+};
 
 /**
  * Apply a query-string to a destination URL.
@@ -191,7 +218,7 @@ function applyReferrer(url) {
  * @return {string}
  *   The transformed URL.
  */
-function applyUrl (url, parts) {
+app_link.applyUrl = function (url, parts) {
   var parser = document.createElement("a");
   parser.href = url;
   if (typeof parts.pathname === "string") {
@@ -220,162 +247,69 @@ function applyUrl (url, parts) {
     parser.hash = parts.hash;
   }
   return parser.href;
+};
+
+
+/**
+ * Most webkits are cool with timeout.
+ *
+ * @param {string} url
+ *   The URL to direct to.
+ *
+ * @return {string}
+ *   The URL directed to.
+ */
+app_link.direct = function (url) {
+  if (!url) {
+    return app_link.fallback();
+  }
+  // If we're still here, try the iframe trick.
+  var timerIframe = setTimeout(function() {
+    app_link.tryIframeRedirect(url);
+  }, 1500);
+  // Unless, PageVisiblityAPI has hidden the page, then we're done.
+  var timerHeartbeat = setInterval(function () {
+    if (document.webkitHidden || document.hidden) {
+      clearInterval(timerHeartbeat);
+      clearTimeout(timerIframe);
+    }
+  }, 200);
+  document.location = url;
+  return url;
 }
 
 /**
- * Directs an iPhone-like device to the Mobile App or Store.
+ * A lot of Androids, like the hidden iframe trick.
  *
- * @param {object} platform
- *   - {string} platform.app_url
- *     URL Scheme to the app.
- *   - {string} platform.store_url
- *     URL to find this app in the app store.
- *   - {boolean} platform.supports_qs
- *     True if the App URL supports appending a query-string
- *   - {boolean} platform.supports_path
- *     True if the App URL supports appending a path
- *   - {array} platform.path_whitelist
- *     RegExp strings to filter the query-string path by.
- * @param {string} fallbackUrl
- *   URL to go to, if app is not installed.
+ * @param {string} url
+ *   The URL to direct to.
  *
  * @return {string}
- *   Primary URL that we will attempt to redirect to.
+ *   The URL directed to.
  */
-app_link.routers.iphone = function (platform, fallbackUrl) {
-  var appUrl = transformUrl(platform.app_url, platform.supports_qs, platform.supports_path, platform.path_whitelist);
-  fallbackUrl = transformUrl(platform.store_url, platform.supports_store_qs) || fallbackUrl;
-
-  setTimeout(fallback, 25);
-  return tryIframeApproach();
-
-  /**
-   * Newer iOS versions complain about direct location
-   */
-  function tryIframeApproach() {
-    if (!appUrl) {
-      return fallback();
-    }
-    var iframe = document.createElement("iframe");
-    document.body.appendChild(iframe);
-    iframe.onload = fallback;
-    iframe.onerror = fallback;
-    iframe.src = appUrl;
-    return appUrl;
+app_link.iframe = function (url) {
+  if (!url) {
+    return app_link.fallback();
   }
-
-  /**
-   * Fallback if they don't have app installed
-   */
-  function fallback () {
-    if (!document.webkitHidden && !document.hidden) {
-      window.location = fallbackUrl;
-    }
-    return fallbackUrl;
-  }
+  var iframe = document.createElement("iframe");
+  iframe.style.border = "none";
+  iframe.style.width = "1px";
+  iframe.style.height = "1px";
+  iframe.onload = app_link.fallback;
+  iframe.onerror = app_link.fallback;
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  return url;
 };
 
 /**
- * Directs an Android-like device to the Mobile App or Store.
- *
- * @param {object} platform
- *   - {string} platform.app_url
- *     URL Scheme to the app.
- *   - {string} platform.intent_url
- *     Intent URL to the app.
- *   - {string} platform.store_url
- *     URL to find this app in the app store.
- *   - {boolean} platform.supports_qs
- *     True if the App URL supports appending a query-string
- *   - {boolean} platform.supports_path
- *     True if the App URL supports appending a path
- *   - {array} platform.path_whitelist
- *     RegExp strings to filter the query-string path by.
- * @param {string} fallbackUrl
- *   URL to go to, if app is not installed.
- *
- * @return {string}
- *   Primary URL that we will attempt to redirect to.
+ * Fallback if they don't have app installed.
+ * Unless, PageVisiblityAPI has hidden the page.
  */
-app_link.routers.android = function (platform, fallbackUrl) {
-  var appUrl = transformUrl(platform.app_url, platform.supports_qs, platform.supports_path, platform.path_whitelist);
-  var intentUrl = transformUrl(platform.intent_url, platform.supports_qs, platform.supports_path, platform.path_whitelist);
-  fallbackUrl = transformUrl(platform.store_url, platform.supports_store_qs) || fallbackUrl;
-  var UA = navigator.userAgent;
-  var timerHeartbeat = setInterval(intervalHeartbeat, 200);
-  var timerIframe;
-  var timerWebkit;
-
-  if (UA.match(/Chrome/)) {
-    return useIntent();
-  } else if (UA.match(/Firefox/)) {
-    return tryWebkitApproach();
-  } else {
-    return tryIframeApproach();
+app_link.fallback = function () {
+  if (!document.webkitHidden && !document.hidden) {
+    window.location = app_link.fallbackUrl;
+    return app_link.fallbackUrl;
   }
-
-  /**
-   * If PageVisiblityAPI has hidden the page, we're done here.
-   * Clear all previously set timers.
-   */
-  function intervalHeartbeat() {
-    if (document.webkitHidden || document.hidden) {
-      clearInterval(timerHeartbeat);
-      clearTimeout(timerWebkit);
-      clearTimeout(timerIframe);
-    }
-  }
-
-  /**
-   * A lot of Androids, like the hidden iframe trick.
-   */
-  function tryIframeApproach() {
-    if (!appUrl) {
-      return fallback();
-    }
-    var iframe = document.createElement("iframe");
-    iframe.style.border = "none";
-    iframe.style.width = "1px";
-    iframe.style.height = "1px";
-    iframe.onload = fallback;
-    iframe.onerror = fallback;
-    iframe.src = appUrl;
-    document.body.appendChild(iframe);
-    return appUrl;
-  }
-
-  /**
-   * Most webkits are cool with timeout.
-   */
-  function tryWebkitApproach() {
-    if (!appUrl) {
-      return fallback();
-    }
-    timerIframe = setTimeout(tryIframeApproach, 1500);
-    timerWebkit = setTimeout(fallback, 2500);
-    document.location = appUrl;
-    return appUrl;
-  }
-
-  /**
-   * Newer Droids must use Intents
-   */
-  function useIntent() {
-    if (!intentUrl) {
-      return fallback();
-    }
-    document.location = intentUrl;
-    return intentUrl;
-  }
-
-  /**
-   * Fallback if they don't have app installed.
-   * PageVisiblityAPI has hidden the page.
-   */
-  function fallback () {
-    if (!document.webkitHidden && !document.hidden) {
-      window.location = fallbackUrl;
-    }
-    return fallbackUrl;
-  }
+  return '';
 };

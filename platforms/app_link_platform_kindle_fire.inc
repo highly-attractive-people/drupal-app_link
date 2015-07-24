@@ -6,52 +6,8 @@
 
 $plugin = array(
   'title' => t('Kindle Fire App'),
-  'js' => array(
-    'router' => 'iphone',
-    'match' => 'Kindle',
-  ),
-  'form' => 'app_link_platform_kindle_fire_form',
   'badge_url' => '//g-ec2.images-amazon.com/images/G/01/DevMarketing/amazon-apps-kindle-us-black._V306408287_.png',
   'store_text' => t('Available at Amazon'),
+  'store_title' => t("Amazon's Fire Store"),
+  'store_pattern' => 'http://www.amazon.com/gp/product/<product_id>',
 );
-
-/**
- * Construct a Drupal form for Kindle Fire platform parameters.
- *
- * @param array $conf
- *   An array of existing configurations.
- *
- * @return array
- *   A Drupal form structure.
- */
-function app_link_platform_kindle_fire_form(array $conf = array()) {
-  $form = array(
-    '#type' => 'fieldset',
-    '#title' => t('Kindle Fire App'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-    '#tree' => TRUE,
-  );
-  $form['app_url'] = array(
-    '#title' => t('App URL Scheme'),
-    '#description' => t('URL Scheme of the Kindle Fire App to redirect to'),
-    '#attributes' => array('placeholder' => 'myapp://'),
-    '#type' => 'textfield',
-    '#element_validate' => array('app_link_valid_url_scheme'),
-    '#maxlength' => 2000,
-    '#required' => FALSE,
-    '#default_value' => isset($conf['app_url']) ? $conf['app_url'] : '',
-  );
-  $form['store_url'] = array(
-    '#title' => t('App Page on Amazon'),
-    '#description' => t('The URL where you can download App lives in Amazon\'s Fire Store.'),
-    '#attributes' => array('placeholder' => 'http://www.amazon.com/gp/product/<product_id>'),
-    '#type' => 'textfield',
-    '#element_validate' => array('app_link_valid_url'),
-    '#maxlength' => 2000,
-    '#required' => FALSE,
-    '#default_value' => isset($conf['store_url']) ? $conf['store_url'] : '',
-  );
-  app_link_qs_path_form($conf, $form);
-  return $form;
-}
