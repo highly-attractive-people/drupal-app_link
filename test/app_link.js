@@ -271,12 +271,23 @@ describe("App Link Redirects", function() {
    * Test Async Before Hook.
    */
   describe("Before Hook", function() {
-    it("Should run sync.", function(done) {
+    it("Modifies fallback variable.", function(done) {
       testApplinkRedirect({inject: function() {
-        app_link.before = function(cb){ cb(); };
-      }}, applink.app_link_platform_fallback.fallback_url, done);
+        app_link.before = function(cb){
+          app_link.fallbackUrl += "?a=b";
+          cb();
+        };
+      }}, applink.app_link_platform_fallback.fallback_url + "?a=b", done);
     });
-    it("Should wait for async.", function(done) {
+    it("Modifies platform variables.", function(done) {
+      testApplinkRedirect({browser: "iPhone", inject: function() {
+        app_link.before = function(cb){
+          app_link.platforms.app_link_platform_iphone.app_url += "?a=b";
+          cb();
+        };
+      }}, applink.app_link_platform_iphone.app_url + "?a=b", done);
+    });
+    it("Wait for async.", function(done) {
       testApplinkRedirect({inject: function() {
         app_link.before = function(cb){ setTimeout(cb, 33); };
       }}, applink.app_link_platform_fallback.fallback_url, done);

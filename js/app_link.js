@@ -31,17 +31,20 @@
  *   Primary URL that we will attempt to redirect to.
  */
 function app_link (platforms, fallbackUrl) {
+  // Set variables, allowing before hooks to alter.
+  app_link.platforms = platforms;
+  app_link.fallbackUrl = fallbackUrl;
   // Exexcute any before hooks.
   if (app_link.before) {
     return app_link.before(function() {
       app_link.before = null;
-      app_link(platforms, fallbackUrl);
+      app_link(app_link.platforms, app_link.fallbackUrl);
     });
   }
   // Add referrer to fallback (Server is unable to do this accurately).
   var platform = platforms.app_link_platform_fallback;
   if (platform && platform.supports_qs) {
-    fallbackUrl = app_link.applyReferrer(app_link.fallbackUrl);
+    app_link.fallbackUrl = app_link.applyReferrer(app_link.fallbackUrl);
   }
   // Determine the user's platform.
   var platformKey = app_link.getPlatformKey(navigator.userAgent) || app_link.getPlatformKey(navigator.appVersion);
@@ -52,7 +55,6 @@ function app_link (platforms, fallbackUrl) {
     el.className = "";
   }
   // If we don't recognize the platform, or have data about the platform -- fallback.
-  app_link.fallbackUrl = fallbackUrl;
   if (!platform) {
     return app_link.fallback();
   }
