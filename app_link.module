@@ -136,7 +136,9 @@ function app_link_bounce($applink) {
   // Merge Platform JS info data.
   $platforms = array();
   foreach ($applink['platform_info'] as $id => $platform) {
-    $platforms[$id] = $applink['platform_data'][$id];
+    if (!empty($applink['platform_data'][$id])) {
+      $platforms[$id] = $applink['platform_data'][$id];
+    }
   }
 
   drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
