@@ -251,6 +251,25 @@ app_link.applyUrl = function (url, parts) {
   return parser.href;
 };
 
+/**
+ * The browser doesn't tell us if we were successful or not.
+ *   Keep a heartbeat to see if the page is still visible.
+ *
+ * @param {function} callback
+ *   Called when we failed to do what was exected.
+ */
+app_link.onFailure = function (callback) {
+  var timerFailed = setTimeout(callback, 2000);
+  // If we know the page is hidden, then we did not fail.
+  // Cancel the failure and attempt to close out.
+  var timerHeartbeat = setInterval(function () {
+    if (document.webkitHidden || document.hidden) {
+      clearInterval(timerHeartbeat);
+      clearTimeout(timerFailed);
+      window.close();
+    }
+  }, 100);
+};
 
 /**
  * Most webkits are cool with timeout.
@@ -266,19 +285,12 @@ app_link.direct = function (url) {
     return app_link.fallback();
   }
   // If we're still here, try the iframe trick.
-  var timerIframe = setTimeout(function() {
-    app_link.tryIframeRedirect(url);
-  }, 1500);
-  // Unless, PageVisiblityAPI has hidden the page, then we're done.
-  var timerHeartbeat = setInterval(function () {
-    if (document.webkitHidden || document.hidden) {
-      clearInterval(timerHeartbeat);
-      clearTimeout(timerIframe);
-    }
-  }, 200);
+  app_link.onFailure(function() {
+    app_link.iframe(url);
+  });
   document.location = url;
   return url;
-}
+};
 
 /**
  * A lot of Androids, like the hidden iframe trick.
@@ -293,6 +305,8 @@ app_link.iframe = function (url) {
   if (!url) {
     return app_link.fallback();
   }
+  // If we're still here, then give up and go to fallback.
+  app_link.onFailure(app_link.fallback);
   var iframe = document.createElement("iframe");
   iframe.style.border = "none";
   iframe.style.width = "1px";
@@ -313,5 +327,5 @@ app_link.fallback = function () {
     window.location = app_link.fallbackUrl;
     return app_link.fallbackUrl;
   }
-  return '';
+  return "";
 };
