@@ -92,11 +92,11 @@ function app_link (platforms, fallbackUrl) {
 app_link.getPlatformKey = function (UA) {
   var version;
   return (
-    (UA.match(/Android/i) && !UA.match(/Kindle|Windows/i)) ? 'app_link_platform_android' :
-    UA.match(/iPhone|iPod/i) ? 'app_link_platform_iphone' :
-    UA.match(/iPad/i) ? 'app_link_platform_ipad' :
     UA.match(/Windows Phone/i) ? 'app_link_platform_windows_phone' :
     UA.match(/Kindle/i) ? 'app_link_platform_kindle_fire' :
+    UA.match(/Android/i) ? 'app_link_platform_android' :
+    UA.match(/iPhone|iPod/i) ? 'app_link_platform_iphone' :
+    UA.match(/iPad/i) ? 'app_link_platform_ipad' :
     ((version = UA.match(/Windows NT (\d+?.\d+?)/i)) && version[1] - 0 >= 6.2) ? 'app_link_platform_windows' :
     ((version = UA.match(/OS X (\d+?[._]\d+?)/i)) && (version[1] = version[1].replace('_', '.')) && version[1] - 0 >= 10.6) ? 'app_link_platform_mac' :
     ''
