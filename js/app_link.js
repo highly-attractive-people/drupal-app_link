@@ -160,7 +160,8 @@ app_link.isPathWhitelisted = function (path, whitelist) {
 
   // Check each item for a RegEx match.
   for (var i = 0, item, rx; i < whitelist.length; i++) {
-    item = whitelist[i];
+    // Remove carriage return character (\r) if any from whitelist item.
+    item = whitelist[i].replace(/\r/g, '');
     rx = new RegExp(item);
     if (rx.test(path)) {
       return true;

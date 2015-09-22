@@ -494,7 +494,7 @@ function app_link_process_applink($applink) {
       continue;
     }
     // Explode our text field of whitelisted paths into an array.
-    $data['path_whitelist'] = explode("\r\n", $data['path_whitelist']);
+    $data['path_whitelist'] = explode("\n", $data['path_whitelist']);
   }
   return $applink;
 }
