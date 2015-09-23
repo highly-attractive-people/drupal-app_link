@@ -16,7 +16,8 @@
   },
   "scripts": {
     "test": "mocha",
-    "lint": "eslint js/* test/*"
+    "lint": "eslint js/* test/*",
+    "example": "node test/fixtures/http-server"
   },
   "repository": {
     "type": "git",

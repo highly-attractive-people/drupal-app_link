@@ -16,4 +16,4 @@ var app = express();
 app.get("/", function (req, res) {
   res.send(html);
 });
-module.exports = app;
+module.exports = app.listen(process.env.PORT || 3000);
