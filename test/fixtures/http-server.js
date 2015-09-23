@@ -7,6 +7,8 @@ var html = [
   "<head></head>",
   "<body>",
   "<script>" + fs.readFileSync("js/app_link.js") + "</script>",
+  "<script>SAMPLE_PAYLOAD=" + fs.readFileSync("test/fixtures/example-platforms.json") + "</script>",
+  // "<script>app_link(SAMPLE_PAYLOAD)</script>",
   "</body>",
   "</html>"
 ].join("\n");

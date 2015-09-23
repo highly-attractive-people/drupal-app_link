@@ -15,14 +15,14 @@
     },
     "app_link_platform_ipad": {
         "app_url": "ipad-nbctve://",
-        "store_url": "https://itunes.apple.com/us/app/nbc-watch-live-tv-now-stream/id442839435?mt=8",
+        "store_url": "itmss://itunes.apple.com/us/app/nbc-watch-live-tv-now-stream/id442839435?mt=8",
         "supports_qs": 0,
         "supports_path": 0,
         "path_whitelist": []
     },
     "app_link_platform_iphone": {
-        "app_url": "iphone-nbctve://",
-        "store_url": "https://itunes.apple.com/us/app/nbc-watch-live-tv-now-stream/id442839435?mt=8",
+        "app_url": "nbctve://",
+        "store_url": "itmss://itunes.apple.com/us/app/nbc-watch-live-tv-now-stream/id442839435?mt=8",
         "supports_qs": 0,
         "supports_path": 0,
         "path_whitelist": []
