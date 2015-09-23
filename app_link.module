@@ -359,7 +359,7 @@ function app_link_qs_path_form(array $conf, array &$form) {
     '#title' => t("Append the query string to the App's Store URL"),
     '#description' => t("If checked, the query string will be appended the App's Store URL. To support App download trackers. Example:\n/app_link/myapp?a=b&c=d\nhttps://control.kochava.com/v1/cpi/click?a=b&c=d\nT"),
     '#type' => 'checkbox',
-    '#default_value' => isset($conf['supports_store_qs']) ? $conf['supports_store_qs'] : FALSE,
+    '#default_value' => isset($conf['supports_qs']) ? $conf['supports_qs'] : FALSE,
   );
 }
 
