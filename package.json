@@ -7,7 +7,7 @@
     "test": "test"
   },
   "devDependencies": {
-    "eslint": "^1.0.0-rc-1",
+    "eslint": "^1.5.1",
     "express": "^4.13.1",
     "ghooks": "^0.3.2",
     "lodash": "^3.10.0",
