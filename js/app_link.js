@@ -130,7 +130,7 @@ app_link.getOS = function (UA) {
     return version[1] - 0;
   }
   // Mac & iOS
-  version = UA.match(/(OS X|iPad OS|iPhone OS|iPod OS) (\d+?[._]\d+?)/i);
+  version = UA.match(/(iPhone.+OS|iPad.+OS|iPod.+OS|OS X) (\d+?[._]\d+?)/i);
   if (version) {
     return version[2].replace('_', '.') - 0;
   }
