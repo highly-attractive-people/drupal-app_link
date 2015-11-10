@@ -7,16 +7,18 @@
     "test": "test"
   },
   "devDependencies": {
-    "eslint": "^1.0.0-rc-1",
+    "eslint": "^1.5.1",
     "express": "^4.13.1",
     "ghooks": "^0.3.2",
     "lodash": "^3.10.0",
     "mocha": "^2.2.5",
-    "phantom": "^0.7.2"
+    "phantom": "^0.7.2",
+    "portfinder": "^0.4.0"
   },
   "scripts": {
     "test": "mocha",
-    "lint": "eslint js/* test/*"
+    "lint": "eslint js/* test/*",
+    "example": "node test/fixtures/http-server"
   },
   "repository": {
     "type": "git",

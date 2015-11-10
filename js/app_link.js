@@ -31,11 +31,12 @@
  *   Primary URL that we will attempt to redirect to.
  */
 function app_link (platforms, fallbackUrl) {
+  var isRedirectPage = !!location.href.match("app_link_redirect=true");
   // Set variables, allowing before hooks to alter.
   app_link.platforms = platforms;
   app_link.fallbackUrl = fallbackUrl;
   // Exexcute any before hooks.
-  if (app_link.before) {
+  if (app_link.before && !isRedirectPage) {
     return app_link.before(function() {
       app_link.before = null;
       app_link(app_link.platforms, app_link.fallbackUrl);
@@ -66,15 +67,25 @@ function app_link (platforms, fallbackUrl) {
 
   var UA = navigator.userAgent;
 
-  // Newer Droids must use Intents
-  if (UA.match(/Android/) && UA.match(/Chrome/) && !UA.match(/Kindle|Windows/)) {
-    return app_link.direct(intentUrl);
+  // Android w/ Chrome must use Intents
+  if (platformKey === 'app_link_platform_android' && UA.match(/Chrome/)) {
+    return app_link.directOrIframe(intentUrl);
   }
-  // Most webkits are cool with timeout.
-  else if (UA.match(/Android/) && UA.match(/Firefox/)) {
-    return app_link.direct(appUrl);
+  // Firefox likes direct.
+  else if (platformKey === 'app_link_platform_android' && UA.match(/Firefox/)) {
+    return app_link.directOrIframe(appUrl);
   }
-  // Newer iOS & most Android: Don't like direct location, and like the hidden iframe trick.
+  // iOS9 needs middle redirect and confirm handling.
+  // The dialog flow is not pretty - sorry.
+  else if ((platformKey === 'app_link_platform_iphone' || platformKey === 'app_link_platform_ipad') && app_link.getOS(UA) >= 9) {
+    if (isRedirectPage) {
+      return app_link.fallback();
+    }
+    else {
+      return app_link.directOrRedirect(appUrl);
+    }
+  }
+  // Most iOS & Android: Prefers hidden iframe trick over direct.
   else {
     return app_link.iframe(appUrl);
   }
@@ -90,18 +101,41 @@ function app_link (platforms, fallbackUrl) {
  *   A key to App Link platforms data that matches user's platform.
  */
 app_link.getPlatformKey = function (UA) {
-  var version;
   return (
     UA.match(/Windows Phone/i) ? 'app_link_platform_windows_phone' :
     UA.match(/Kindle/i) ? 'app_link_platform_kindle_fire' :
     UA.match(/Android/i) ? 'app_link_platform_android' :
     UA.match(/iPhone|iPod/i) ? 'app_link_platform_iphone' :
     UA.match(/iPad/i) ? 'app_link_platform_ipad' :
-    ((version = UA.match(/Windows NT (\d+?.\d+?)/i)) && version[1] - 0 >= 6.2) ? 'app_link_platform_windows' :
-    ((version = UA.match(/OS X (\d+?[._]\d+?)/i)) && (version[1] = version[1].replace('_', '.')) && version[1] - 0 >= 10.6) ? 'app_link_platform_mac' :
+    (UA.match(/Windows NT/) && app_link.getOS(UA) >= 6.2) ? 'app_link_platform_windows' :
+    (UA.match(/OS X/) && app_link.getOS(UA) >= 10.6) ? 'app_link_platform_mac' :
     ''
   );
 };
+
+/**
+ * Detect version of OS operating system.
+ *
+ * @param {string} UA
+ *   Browser userAgent or appVersion.
+ *
+ * @return {number}
+ *   Representing version of operating system.
+ */
+app_link.getOS = function (UA) {
+  var version;
+  // Windows
+  version = UA.match(/Windows NT (\d+?.\d+?)/i);
+  if (version) {
+    return version[1] - 0;
+  }
+  // Mac & iOS
+  version = UA.match(/(iPhone.+OS|iPad.+OS|iPod.+OS|OS X) (\d+?[._]\d+?)/i);
+  if (version) {
+    return version[2].replace('_', '.') - 0;
+  }
+  return 0;
+}
 
 /**
  * Transform a given URL URL.
@@ -273,7 +307,7 @@ app_link.onFailure = function (callback) {
 };
 
 /**
- * Most webkits are cool with timeout.
+ * Redirect. If it fails, try iframe trick.
  *
  * @param {string} url
  *   The URL to direct to.
@@ -281,13 +315,35 @@ app_link.onFailure = function (callback) {
  * @return {string}
  *   The URL directed to.
  */
-app_link.direct = function (url) {
+app_link.directOrIframe = function (url) {
   if (!url) {
     return app_link.fallback();
   }
   // If we're still here, try the iframe trick.
   app_link.onFailure(function() {
     app_link.iframe(url);
+  });
+  document.location = url;
+  return url;
+};
+
+/**
+ * Redirect. If it fails, redirect to temp page with the store.
+ *
+ * @param {string} url
+ *   The URL to direct to.
+ *
+ * @return {string}
+ *   The URL directed to.
+ */
+app_link.directOrRedirect = function (url) {
+  if (!url) {
+    return app_link.fallback();
+  }
+  // If we're still here, try the iframe trick.
+  app_link.onFailure(function() {
+    var href = url = location.href;
+    document.location = href + (href.match(/\?/) ? "&" : "?") + "app_link_redirect=true";
   });
   document.location = url;
   return url;
@@ -327,6 +383,9 @@ app_link.fallback = function () {
   if (!document.webkitHidden && !document.hidden) {
     window.location = app_link.fallbackUrl;
     return app_link.fallbackUrl;
+  }
+  else {
+    window.close();
   }
   return "";
 };
