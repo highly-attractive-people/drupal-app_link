@@ -85,6 +85,10 @@ function app_link (platforms, fallbackUrl) {
       return app_link.directOrRedirect(appUrl);
     }
   }
+  // iOS8 Chrome prefers directOrIframe trick.
+  else if((platformKey === 'app_link_platform_iphone' || platformKey === 'app_link_platform_ipad') &&  UA.match(/CriOS/)) {
+    return app_link.directOrIframe(appUrl);
+  }
   // Most iOS & Android: Prefers hidden iframe trick over direct.
   else {
     return app_link.iframe(appUrl);
