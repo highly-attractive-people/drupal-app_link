@@ -3,6 +3,7 @@
 "use strict";
 var phantom = require("phantom");
 var clone = require("lodash/lang/cloneDeep");
+var startServer = require("./fixtures/http-server");
 var PLATFORMS = require("./fixtures/example-platforms.json");
 
 var USERAGENTS = {
@@ -24,13 +25,19 @@ var USERAGENTS = {
 
 describe("App Link Redirects", function() {
   // Web-server for simple page: Phantom works more naturally with URLs than Files.
-  var server;
   var BASE_URL;
   // This spawns a separate PhantomJS process that will talk back asyncronously via WebSocket.
   var phantom_instance;
   before(function(done) {
-    server = require("./fixtures/http-server");
-    BASE_URL = "http://localhost:" + server.address().port + "/";
+    startServer(function(err, server) {
+      if (err) {
+        return done(err);
+      }
+      BASE_URL = "http://localhost:" + server.address().port + "/";
+      done();
+    });
+  });
+  before(function(done) {
     phantom.create(function (ph) {
       phantom_instance = ph;
       done();
