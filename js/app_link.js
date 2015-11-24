@@ -106,12 +106,11 @@ function app_link (platforms, fallbackUrl) {
  */
 app_link.getPlatformKey = function (UA) {
   return (
-    UA.match(/Windows Phone/i) ? 'app_link_platform_windows_phone' :
+    (UA.match(/Windows Phone/i) || (UA.match(/Windows NT/) && app_link.getOS(UA) >= 6.2)) ? 'app_link_platform_windows' :
     UA.match(/Kindle/i) ? 'app_link_platform_kindle_fire' :
     UA.match(/Android/i) ? 'app_link_platform_android' :
     UA.match(/iPhone|iPod/i) ? 'app_link_platform_iphone' :
     UA.match(/iPad/i) ? 'app_link_platform_ipad' :
-    (UA.match(/Windows NT/) && app_link.getOS(UA) >= 6.2) ? 'app_link_platform_windows' :
     (UA.match(/OS X/) && app_link.getOS(UA) >= 10.6) ? 'app_link_platform_mac' :
     ''
   );
