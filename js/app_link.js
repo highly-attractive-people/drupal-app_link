@@ -128,12 +128,12 @@ app_link.getPlatformKey = function (UA) {
 app_link.getOS = function (UA) {
   var version;
   // Windows
-  version = UA.match(/Windows NT (\d+?.\d+?)/i);
+  version = UA.match(/Windows NT (\d+.\d+)/i);
   if (version) {
     return version[1] - 0;
   }
   // Mac & iOS
-  version = UA.match(/(iPhone.+OS|iPad.+OS|iPod.+OS|OS X) (\d+?[._]\d+?)/i);
+  version = UA.match(/(iPhone.+OS|iPad.+OS|iPod.+OS|OS X) (\d+[._]\d+)/i);
   if (version) {
     return version[2].replace('_', '.') - 0;
   }
