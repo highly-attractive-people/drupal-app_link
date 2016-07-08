@@ -82,7 +82,7 @@ function app_link (platforms, fallbackUrl) {
       return app_link.fallback();
     }
     else {
-      return app_link.directOrRedirect(appUrl);
+      return app_link.ios9(appUrl);
     }
   }
   // iOS8 Chrome prefers directOrIframe trick.
@@ -296,9 +296,11 @@ app_link.applyUrl = function (url, parts) {
  *
  * @param {function} callback
  *   Called when we failed to do what was exected.
+ * @param {number} wait
+ *   Number of Milliseconds before redirecting failure case
  */
-app_link.onFailure = function (callback) {
-  var timerFailed = setTimeout(callback, 2000);
+app_link.onFailure = function (callback, wait) {
+  var timerFailed = setTimeout(callback, wait || 2000);
   // If we know the page is hidden, then we did not fail.
   // Cancel the failure and attempt to close out.
   var timerHeartbeat = setInterval(function () {
@@ -324,9 +326,15 @@ app_link.directOrIframe = function (url) {
     return app_link.fallback();
   }
   // If we're still here, try the iframe trick.
-  app_link.onFailure(function() {
-    app_link.iframe(url);
-  });
+  var timerFailed = setTimeout(function () {
+    if (document.webkitHidden || document.hidden) {
+      clearTimeout(timerFailed);
+      window.close();
+    }
+    else {
+      app_link.iframe(url);
+    }
+  }, 30000);
   document.location = url;
   return url;
 };
@@ -340,16 +348,25 @@ app_link.directOrIframe = function (url) {
  * @return {string}
  *   The URL directed to.
  */
-app_link.directOrRedirect = function (url) {
+app_link.ios9 = function (url) {
   if (!url) {
     return app_link.fallback();
   }
-  // If we're still here, try the iframe trick.
-  app_link.onFailure(function() {
-    var href = url = location.href;
-    document.location = href + (href.match(/\?/) ? "&" : "?") + "app_link_redirect=true";
-  });
-  document.location = url;
+  // Need a timeout for images to successfully load.
+  setTimeout(function() {
+    // If we're still here, try the iframe trick.
+    app_link.onFailure(function() {
+      // The secondary redirect must be to http - not ios9 app store.
+      if (app_link.fallback.substr(0, 4) !== 'http') {
+        var href = location.href;
+        document.location = href + (href.match(/\?/) ? "&" : "?") + "app_link_redirect=true";
+      }
+      else {
+        document.location = app_link.fallback;
+      }
+    }, 30000);
+    document.location = url;
+  }, 500);
   return url;
 };
 
