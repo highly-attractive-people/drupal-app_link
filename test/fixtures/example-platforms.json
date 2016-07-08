@@ -34,13 +34,6 @@
         "supports_path": 0,
         "path_whitelist": []
     },
-    "app_link_platform_windows_phone": {
-        "app_url": "winmo-nbctve://",
-        "store_url": "http://www.windowsphone.com/en-us/store/app/nbc-sports-live-extra/2bfb700d-7703-45ac-818e-677857b3b849",
-        "supports_qs": 0,
-        "supports_path": 0,
-        "path_whitelist": []
-    },
     "app_link_platform_mac": {
         "app_url": "mac-nbctve://",
         "store_url": "https://itunes.apple.com/us/app/nbc-watch-live-tv-now-stream/id442839435?mt=8",
