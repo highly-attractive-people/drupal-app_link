@@ -194,7 +194,6 @@ describe("App Link Redirects", function() {
   testPlatform("iPad", "app_link_platform_ipad");
   testPlatform("Android Browser", "app_link_platform_android");
   testPlatform("Android Chrome", "app_link_platform_android");
-  testPlatform("Windows Phone", "app_link_platform_windows_phone");
   testPlatform("Kindle Fire", "app_link_platform_kindle_fire");
   testPlatform("OSX Safari", "app_link_platform_mac");
   testPlatform("OSX Chrome", "app_link_platform_mac");
