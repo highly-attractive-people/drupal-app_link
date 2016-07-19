@@ -55,6 +55,11 @@ function app_link (platforms, fallbackUrl) {
   if (el) {
     el.className = "";
   }
+  // Display correct app icon with link based on platform in case the redirect fails or user returns to page.
+  var logoEl = platformKey && document.getElementById(platformKey + '_logo');
+  if (logoEl) {
+    logoEl.className = "";
+  }
   // If we don't recognize the platform, or have data about the platform -- fallback.
   if (!platform) {
     return app_link.fallback();
