@@ -28,7 +28,13 @@ img { max-width: 100% }
 <?php endif; ?>
 
 <?php if (!empty($promo_image)) : ?>
-  <p id="badge" class="hidden"><img src="<?php print $promo_image; ?>" alt="" /></p>
+  <p id="badge" class="hidden">
+    <?php foreach ($store_badges as $platform_id => $badge) : ?>
+      <a id="<?php print $platform_id ?>_logo" href="<?php print $badge['store_url']; ?>" class="hidden">
+        <img src="<?php print $promo_image; ?>" alt="" />
+      </a>
+    <?php endforeach; ?>
+  </p>
 <?php endif; ?>
 
 <p class="app-store-badges">
