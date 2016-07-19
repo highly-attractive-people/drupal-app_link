@@ -42,6 +42,18 @@ function app_link_schema() {
         'default' => '',
         'description' => 'Unique name to refer to App.',
       ),
+      'promo_text' => array(
+        'type' => 'text',
+        'size' => 'normal',
+        'description' => 'Promotional Text.',
+      ),
+      'promo_image' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'App Image {file_managed}.fid identifier.',
+      ),
       'platform_data' => array(
         'type' => 'text',
         'size' => 'big',
@@ -140,4 +152,22 @@ function app_link_update_7103() {
  */
 function app_link_update_7104() {
   db_drop_field('applink', 'web_url');
+}
+
+/**
+ * Add new fields for promotional information.
+ */
+function app_link_update_7105() {
+  db_add_field('applink', 'promo_text', array(
+    'type' => 'text',
+    'size' => 'normal',
+    'description' => 'Promotional Text.',
+  ));
+  db_add_field('applink', 'promo_image', array(
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+    'description' => 'App Image {file_managed}.fid identifier.',
+  ));
 }

@@ -90,11 +90,20 @@ function app_link_theme($existing, $type, $theme, $path) {
         'platforms' => '',
         'fallback_url' => '',
         'canonical_link' => '',
+        'promo_text' => '',
+        'promo_image' => '',
         'scripts' => array(),
         'metatags' => array(),
       ),
       'path' => $path . '/templates',
       'template' => 'app-link',
+    ),
+    'app_link_content' => array(
+      'variables' => array(
+        'store_badges' => array(),
+      ),
+      'path' => $path . '/templates',
+      'template' => 'app-link-content',
     ),
   );
 }
@@ -103,6 +112,7 @@ function app_link_theme($existing, $type, $theme, $path) {
  * Prints html file by bypassing page.tpl.php.
  */
 function app_link_bounce($applink) {
+  global $base_url;
   $applink = app_link_process_applink($applink);
   $platform_data = $applink->platform_data;
   $fallback_url = app_link_get_fallback_url($applink);
@@ -121,6 +131,13 @@ function app_link_bounce($applink) {
 
   $store_badges = app_link_get_store_badges($platform_info, $platform_data);
 
+  try {
+    $promo_image = empty($applink->promo_image) ? NULL : file_create_url(file_load($applink->promo_image)->uri);
+  }
+  catch (Exception $e) {
+    $promo_image = NULL;
+  }
+
   // Allow other modules to hook and alter the data set.
   $applink = array(
     'platform_info' => $platform_info,
@@ -130,6 +147,8 @@ function app_link_bounce($applink) {
     'scripts' => $scripts,
     'metatags' => $metatags,
     'store_badges' => $store_badges,
+    'promo_text' => empty($applink->promo_text) ? '' : $applink->promo_text,
+    'promo_image' => $promo_image,
   );
   drupal_alter('applink_info', $applink);
 
@@ -146,6 +165,9 @@ function app_link_bounce($applink) {
     'platforms' => drupal_json_encode($platforms),
     'fallback_url' => drupal_json_encode($applink['fallback_url']),
     'canonical_link' => $fallback_url,
+    'base_url' => $base_url,
+    'promo_text' => $applink['promo_text'],
+    'promo_image' => $applink['promo_image'],
     'scripts' => $applink['scripts'],
     'metatags' => $applink['metatags'],
     'store_badges' => $applink['store_badges'],
@@ -172,6 +194,21 @@ function app_link_ctools_export_ui_form(&$form, &$form_state) {
     '#maxlength' => 255,
     '#required' => TRUE,
   );
+  $form['promo_text'] = array(
+    '#title' => t('Promotional Text'),
+    '#description' => t('Text to displayed when we cannot redirect the user.'),
+    '#type' => 'textfield',
+    '#maxlength' => 2000,
+    '#default_value' => !empty($applink->promo_text) ? $applink->promo_text : '',
+  );
+  $form['promo_image'] = array(
+    '#title' => t('App Image'),
+    '#description' => t('Image to displayed when we cannot redirect the user.'),
+    '#type' => 'managed_file',
+    '#upload_location' => 'public://app_link/',
+    '#upload_validators'  => array('file_validate_is_image' => array()),
+    '#default_value' => !empty($applink->promo_image) ? $applink->promo_image : '',
+  );
   $form['platform_data'] = array(
     '#tree' => TRUE,
   );
@@ -186,6 +223,26 @@ function app_link_ctools_export_ui_form(&$form, &$form_state) {
   }
 
   return $form;
+}
+
+/**
+ * Submit handler for app_link_ctools_export_ui_form().
+ */
+function app_link_ctools_export_ui_form_submit(&$form, &$form_state) {
+  // Dance to ensure upload file is valid.
+  $account = $GLOBALS['user'];
+  $file = file_load($form_state['values']['promo_image']);
+  $file->status = FILE_STATUS_PERMANENT;
+  file_save($file);
+  file_usage_add($file, 'app_link', 'promo_image', $account->uid);
+
+  // Transfer data from the form to the $item based upon schema values.
+  $schema = ctools_export_get_schema('applink');
+  foreach (array_keys($schema['fields']) as $key) {
+    if (isset($form_state['values'][$key])) {
+      $form_state['item']->{$key} = $form_state['values'][$key];
+    }
+  }
 }
 
 /**
@@ -254,7 +311,7 @@ function app_link_valid_url($element, &$form_state) {
  */
 function app_link_valid_id($element, &$form_state) {
   if (!empty($element['#value']) && preg_match('/[^a-z0-9\-\_]/', $element['#value'])) {
-    form_error($element, t('The @field is an invalid Path Idenfier', array(
+    form_error($element, t('The @field is an invalid Path Identifier', array(
       '@field' => $element['#title'],
     )));
   }
